@@ -1,0 +1,19 @@
+# Generated XML output
+04_generated/*.xml
+
+# Python
+__pycache__/
+*.pyc
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# FT Optix / private project files
+*.optix
+*.bak
+*.zip
+
+# Do not commit local/customer/internal exports unless sanitized
+01_original_exports/private/
