@@ -1,6 +1,3 @@
-# Generated XML output
-04_generated/*.xml
-
 # Python
 __pycache__/
 *.pyc
@@ -10,10 +7,10 @@ __pycache__/
 Thumbs.db
 .vscode/
 
-# FT Optix / private project files
+# FT Optix local project files
 *.optix
 *.bak
 *.zip
 
-# Do not commit local/customer/internal exports unless sanitized
-01_original_exports/private/
+# Local-only material
+01_original_exports/local_only/
