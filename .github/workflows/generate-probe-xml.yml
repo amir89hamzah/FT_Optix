@@ -1,0 +1,38 @@
+name: Generate FT Optix XML probes
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate XML probes
+        run: python 05_scripts/generate_probes.py
+
+      - name: Validate generated XML
+        run: |
+          python 05_scripts/validate_nodes.py 04_generated/AI_ModelProbe_01.xml
+          python 05_scripts/validate_nodes.py 04_generated/AI_ModelProbe_02_ProcessModel.xml
+          python 05_scripts/validate_nodes.py 04_generated/AI_ModelProbe_03_DashboardRuntimeData.xml
+
+      - name: Commit generated XML
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add 04_generated/*.xml
+          git diff --cached --quiet || git commit -m "Generate FT Optix XML probe files"
+          git push
