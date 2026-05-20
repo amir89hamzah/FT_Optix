@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate FT Optix XML probe files.
 
-These probes are intentionally Model-folder only.
+These probes are intentionally Model-folder first.
 Tested manually with FT Optix Studio v1.7.2.51.
 """
 
@@ -28,10 +28,14 @@ DATA_TYPES = {
     "DateTime": ("i=294", "DateTime"),
 }
 
+BASE_OBJECT_TYPE = "i=58"
 FOLDER_TYPE = "i=61"
 BASE_DATA_VARIABLE_TYPE = "i=63"
 HAS_TYPE_DEFINITION = "i=40"
+HAS_SUBTYPE = "i=45"
 HAS_COMPONENT = "i=47"
+HAS_MODELLING_RULE = "i=37"
+MODELLING_RULE_MANDATORY = "i=78"
 
 
 def q(tag: str, ns: str = NS_UA) -> str:
@@ -61,6 +65,19 @@ class ProbeBuilder:
         SubElement(refs, q("Reference"), {"ReferenceType": HAS_TYPE_DEFINITION}).text = type_def
         if parent_path:
             SubElement(refs, q("Reference"), {"ReferenceType": HAS_COMPONENT, "IsForward": "false"}).text = self.nodeid(parent_path)
+        return refs
+
+    def _write_value(self, var, dtype: str, value):
+        val_el = SubElement(var, q("Value"))
+        child = SubElement(val_el, uax(DATA_TYPES[dtype][1]))
+        if dtype == "Boolean":
+            child.text = "true" if bool(value) else "false"
+        elif dtype in {"Float", "Double"}:
+            child.text = f"{float(value):.6g}"
+        elif dtype in {"Int32", "UInt32"}:
+            child.text = str(int(value))
+        else:
+            child.text = str(value)
 
     def add_folder(self, path: str, desc: str | None = None):
         parent_path = "/".join(path.split("/")[:-1]) if "/" in path else None
@@ -73,9 +90,76 @@ class ProbeBuilder:
             SubElement(obj, q("Description")).text = desc
         self._refs(obj, FOLDER_TYPE, parent_path)
 
+    def add_object(self, path: str, type_def: str = BASE_OBJECT_TYPE, desc: str | None = None):
+        """Add a plain UAObject instance.
+
+        If type_def is a custom NodeId, the object becomes an instance of that object type.
+        """
+        parent_path = "/".join(path.split("/")[:-1]) if "/" in path else None
+        attrs = {"NodeId": self.nodeid(path), "BrowseName": "1:" + path.split("/")[-1], "WriteMask": "69876"}
+        if parent_path:
+            attrs["ParentNodeId"] = self.nodeid(parent_path)
+        obj = SubElement(self.root, q("UAObject"), attrs)
+        SubElement(obj, q("DisplayName")).text = path.split("/")[-1]
+        if desc:
+            SubElement(obj, q("Description")).text = desc
+        self._refs(obj, type_def, parent_path)
+
+    def add_object_type(self, type_name: str, desc: str | None = None) -> str:
+        """Add a minimal custom UAObjectType under BaseObjectType.
+
+        The returned NodeId can be used as the HasTypeDefinition target for instances.
+        """
+        type_path = f"ObjectTypes/{type_name}"
+        obj_type = SubElement(
+            self.root,
+            q("UAObjectType"),
+            {
+                "NodeId": self.nodeid(type_path),
+                "BrowseName": "1:" + type_name,
+                "WriteMask": "0",
+                "IsAbstract": "false",
+            },
+        )
+        SubElement(obj_type, q("DisplayName")).text = type_name
+        if desc:
+            SubElement(obj_type, q("Description")).text = desc
+        refs = SubElement(obj_type, q("References"))
+        SubElement(refs, q("Reference"), {"ReferenceType": HAS_SUBTYPE, "IsForward": "false"}).text = BASE_OBJECT_TYPE
+        return self.nodeid(type_path)
+
+    def add_type_var(self, type_name: str, name: str, dtype: str, value=None, desc: str | None = None):
+        """Add a variable declaration below a custom object type.
+
+        FT Optix import behavior for this pattern is intentionally being probed.
+        """
+        parent_path = f"ObjectTypes/{type_name}"
+        path = f"{parent_path}/{name}"
+        data_id, _ = DATA_TYPES[dtype]
+        var = SubElement(
+            self.root,
+            q("UAVariable"),
+            {
+                "NodeId": self.nodeid(path),
+                "BrowseName": "1:" + name,
+                "ParentNodeId": self.nodeid(parent_path),
+                "WriteMask": "594038",
+                "DataType": data_id,
+                "AccessLevel": "3",
+                "UserAccessLevel": "3",
+            },
+        )
+        SubElement(var, q("DisplayName")).text = name
+        if desc:
+            SubElement(var, q("Description")).text = desc
+        refs = self._refs(var, BASE_DATA_VARIABLE_TYPE, parent_path)
+        SubElement(refs, q("Reference"), {"ReferenceType": HAS_MODELLING_RULE}).text = MODELLING_RULE_MANDATORY
+        if value is not None:
+            self._write_value(var, dtype, value)
+
     def add_var(self, path: str, dtype: str, value=None, desc: str | None = None):
         parent_path = "/".join(path.split("/")[:-1]) if "/" in path else None
-        data_id, val_tag = DATA_TYPES[dtype]
+        data_id, _ = DATA_TYPES[dtype]
         attrs = {
             "NodeId": self.nodeid(path),
             "BrowseName": "1:" + path.split("/")[-1],
@@ -92,16 +176,7 @@ class ProbeBuilder:
             SubElement(var, q("Description")).text = desc
         self._refs(var, BASE_DATA_VARIABLE_TYPE, parent_path)
         if value is not None:
-            val_el = SubElement(var, q("Value"))
-            child = SubElement(val_el, uax(val_tag))
-            if dtype == "Boolean":
-                child.text = "true" if bool(value) else "false"
-            elif dtype in {"Float", "Double"}:
-                child.text = f"{float(value):.6g}"
-            elif dtype in {"Int32", "UInt32"}:
-                child.text = str(int(value))
-            else:
-                child.text = str(value)
+            self._write_value(var, dtype, value)
 
     def write(self, path: Path):
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -211,8 +286,56 @@ def probe_03(out_dir: Path):
     p.write(out_dir / "AI_ModelProbe_03_DashboardRuntimeData.xml")
 
 
+def probe_04(out_dir: Path):
+    """Probe custom object type + object instance.
+
+    Inspired by BoilerDemo's Model/Pumps pattern.
+    This deliberately tests whether FT Optix accepts a minimal UAObjectType and
+    an instance of that type through NodeSet import under Model.
+    """
+    p = ProbeBuilder("AI_ModelProbe_04")
+    root = "AI_ModelProbe_04"
+
+    pump_type_id = p.add_object_type(
+        "AI_MyPump",
+        "Minimal generated pump object type for FT Optix import probing.",
+    )
+    for name, dtype, value, desc in [
+        ("SetSpeed", "Float", 0.0, "Requested pump speed percentage."),
+        ("CurrentSpeed", "Float", 0.0, "Measured pump speed percentage."),
+        ("Command", "String", "Stop", "Simple command text for probe testing."),
+        ("Alarm", "Boolean", False, "Pump alarm state."),
+        ("MinSpeed", "Float", 0.0, "Minimum allowed speed."),
+        ("MaxSpeed", "Float", 100.0, "Maximum allowed speed."),
+        ("UseRunFeedback", "Boolean", True, "Whether run feedback is expected."),
+    ]:
+        p.add_type_var("AI_MyPump", name, dtype, value, desc)
+
+    p.add_folder(root, "Object type and instance probe based on the BoilerDemo pump pattern.")
+    p.add_var(f"{root}/ImportStatus", "String", "AI_ModelProbe_04 imported successfully")
+    p.add_var(f"{root}/ProbeVersion", "String", "04 - model object type and instance")
+    p.add_folder(f"{root}/Pumps")
+
+    for pump_name, set_speed, current_speed, command, alarm in [
+        ("Pump1", 50.0, 47.5, "RunCw", False),
+        ("Pump2", 35.0, 0.0, "Stop", True),
+    ]:
+        base = f"{root}/Pumps/{pump_name}"
+        p.add_object(base, pump_type_id, f"{pump_name} instance of generated AI_MyPump object type.")
+        p.add_var(base + "/SetSpeed", "Float", set_speed)
+        p.add_var(base + "/CurrentSpeed", "Float", current_speed)
+        p.add_var(base + "/Command", "String", command)
+        p.add_var(base + "/Alarm", "Boolean", alarm)
+        p.add_var(base + "/MinSpeed", "Float", 0.0)
+        p.add_var(base + "/MaxSpeed", "Float", 100.0)
+        p.add_var(base + "/UseRunFeedback", "Boolean", True)
+
+    p.write(out_dir / "AI_ModelProbe_04_PumpObjectType.xml")
+
+
 if __name__ == "__main__":
     output = Path("04_generated")
     probe_01(output)
     probe_02(output)
     probe_03(output)
+    probe_04(output)
