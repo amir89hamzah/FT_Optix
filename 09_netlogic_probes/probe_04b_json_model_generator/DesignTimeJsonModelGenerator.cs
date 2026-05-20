@@ -1,0 +1,181 @@
+// Probe 04B - DesignTime NetLogic JSON model generator
+//
+// This is a FT Optix NetLogic template, not a standalone C# console app.
+// Create a DesignTime NetLogic in FT Optix Studio, then adapt/paste this
+// class body into the generated NetLogic file.
+//
+// First test uses embedded JSON to avoid path/permission problems.
+// Later probes can load JSON from a project file or external generated file.
+
+#region Using directives
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
+using FTOptix.Core;
+using FTOptix.HMIProject;
+using UAManagedCore;
+#endregion
+
+public class DesignTimeJsonModelGenerator : BaseNetLogic
+{
+    [ExportMethod]
+    public void GenerateFromEmbeddedJson()
+    {
+        const string jsonSpec = @"
+{
+  ""rootName"": ""AI_JsonProbe_01"",
+  ""variables"": [
+    { ""name"": ""StatusText"", ""dataType"": ""String"", ""value"": ""Created from embedded JSON spec"" },
+    { ""name"": ""GeneratedBy"", ""dataType"": ""String"", ""value"": ""DesignTime NetLogic"" }
+  ],
+  ""objects"": [
+    {
+      ""name"": ""Pump1"",
+      ""variables"": [
+        { ""name"": ""SetSpeed"", ""dataType"": ""Float"", ""value"": 50.0 },
+        { ""name"": ""CurrentSpeed"", ""dataType"": ""Float"", ""value"": 47.5 },
+        { ""name"": ""Running"", ""dataType"": ""Boolean"", ""value"": true }
+      ]
+    },
+    {
+      ""name"": ""Pump2"",
+      ""variables"": [
+        { ""name"": ""SetSpeed"", ""dataType"": ""Float"", ""value"": 35.0 },
+        { ""name"": ""CurrentSpeed"", ""dataType"": ""Float"", ""value"": 0.0 },
+        { ""name"": ""Running"", ""dataType"": ""Boolean"", ""value"": false }
+      ]
+    }
+  ]
+}";
+
+        var spec = JsonSerializer.Deserialize<ModelSpec>(jsonSpec);
+        if (spec == null || string.IsNullOrWhiteSpace(spec.rootName))
+        {
+            Log.Error("Probe04B", "JSON spec is empty or missing rootName.");
+            return;
+        }
+
+        var model = Project.Current.Get("Model");
+        if (model == null)
+        {
+            Log.Error("Probe04B", "Model folder not found.");
+            return;
+        }
+
+        if (model.Get(spec.rootName) != null)
+        {
+            Log.Warning("Probe04B", spec.rootName + " already exists. Delete it manually before running again.");
+            return;
+        }
+
+        var root = InformationModel.MakeObject(spec.rootName);
+        model.Add(root);
+
+        AddVariables(root, spec.variables);
+        AddObjects(root, spec.objects);
+
+        Log.Info("Probe04B", spec.rootName + " generated from embedded JSON.");
+    }
+
+    private void AddObjects(IUANode parent, List<ObjectSpec> objects)
+    {
+        if (objects == null)
+            return;
+
+        foreach (var objectSpec in objects)
+        {
+            if (objectSpec == null || string.IsNullOrWhiteSpace(objectSpec.name))
+                continue;
+
+            var obj = InformationModel.MakeObject(objectSpec.name);
+            parent.Add(obj);
+
+            AddVariables(obj, objectSpec.variables);
+            AddObjects(obj, objectSpec.objects);
+        }
+    }
+
+    private void AddVariables(IUANode parent, List<VariableSpec> variables)
+    {
+        if (variables == null)
+            return;
+
+        foreach (var variableSpec in variables)
+        {
+            if (variableSpec == null || string.IsNullOrWhiteSpace(variableSpec.name))
+                continue;
+
+            var dataType = ResolveDataType(variableSpec.dataType);
+            var variable = InformationModel.MakeVariable(variableSpec.name, dataType);
+            variable.Value = ConvertJsonValue(variableSpec.value, variableSpec.dataType);
+            parent.Add(variable);
+        }
+    }
+
+    private NodeId ResolveDataType(string dataType)
+    {
+        switch ((dataType ?? "String").Trim().ToLowerInvariant())
+        {
+            case "boolean":
+            case "bool":
+                return OpcUa.DataTypes.Boolean;
+            case "float":
+                return OpcUa.DataTypes.Float;
+            case "double":
+                return OpcUa.DataTypes.Double;
+            case "int32":
+            case "int":
+                return OpcUa.DataTypes.Int32;
+            case "uint32":
+            case "uint":
+                return OpcUa.DataTypes.UInt32;
+            case "string":
+            default:
+                return OpcUa.DataTypes.String;
+        }
+    }
+
+    private object ConvertJsonValue(JsonElement value, string dataType)
+    {
+        switch ((dataType ?? "String").Trim().ToLowerInvariant())
+        {
+            case "boolean":
+            case "bool":
+                return value.ValueKind == JsonValueKind.True || (value.ValueKind == JsonValueKind.String && bool.Parse(value.GetString()));
+            case "float":
+                return value.ValueKind == JsonValueKind.Number ? value.GetSingle() : float.Parse(value.GetString());
+            case "double":
+                return value.ValueKind == JsonValueKind.Number ? value.GetDouble() : double.Parse(value.GetString());
+            case "int32":
+            case "int":
+                return value.ValueKind == JsonValueKind.Number ? value.GetInt32() : int.Parse(value.GetString());
+            case "uint32":
+            case "uint":
+                return value.ValueKind == JsonValueKind.Number ? value.GetUInt32() : uint.Parse(value.GetString());
+            case "string":
+            default:
+                return value.ValueKind == JsonValueKind.String ? value.GetString() : value.ToString();
+        }
+    }
+
+    private class ModelSpec
+    {
+        public string rootName { get; set; }
+        public List<VariableSpec> variables { get; set; }
+        public List<ObjectSpec> objects { get; set; }
+    }
+
+    private class ObjectSpec
+    {
+        public string name { get; set; }
+        public List<VariableSpec> variables { get; set; }
+        public List<ObjectSpec> objects { get; set; }
+    }
+
+    private class VariableSpec
+    {
+        public string name { get; set; }
+        public string dataType { get; set; }
+        public JsonElement value { get; set; }
+    }
+}
