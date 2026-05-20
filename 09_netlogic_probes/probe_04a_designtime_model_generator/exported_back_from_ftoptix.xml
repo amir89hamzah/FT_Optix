@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UANodeSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <NamespaceUris>
+    <Uri>NewHMIProject</Uri>
+  </NamespaceUris>
+  <Models>
+    <Model ModelUri="NewHMIProject">
+      <RequiredModel ModelUri="http://opcfoundation.org/UA/"/>
+    </Model>
+  </Models>
+  <Aliases/>
+  <UAVariable NodeId="ns=1;g=92081e02-7bd9-4833-bd53-65ec2157a552" ParentNodeId="ns=1;g=020323f9-ba78-48e2-a22c-c652626952f7" BrowseName="1:Running" WriteMask="594038" DataType="i=1" AccessLevel="0">
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=020323f9-ba78-48e2-a22c-c652626952f7</Reference>
+    </References>
+    <Value>
+      <uax:Boolean>true</uax:Boolean>
+    </Value>
+  </UAVariable>
+  <UAObject NodeId="ns=1;g=57320128-e785-44bc-a2ef-f7ea8739e7dd" ParentNodeId="ns=1;g=020323f9-ba78-48e2-a22c-c652626952f7" BrowseName="1:Pump1" WriteMask="69876">
+    <References>
+      <Reference ReferenceType="i=40">i=58</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=020323f9-ba78-48e2-a22c-c652626952f7</Reference>
+    </References>
+  </UAObject>
+  <UAVariable NodeId="ns=1;g=abb64f89-8a4e-4913-9eb5-fa825a04f2ea" ParentNodeId="ns=1;g=020323f9-ba78-48e2-a22c-c652626952f7" BrowseName="1:TestNumber" WriteMask="594038" DataType="i=10" AccessLevel="0">
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=020323f9-ba78-48e2-a22c-c652626952f7</Reference>
+    </References>
+    <Value>
+      <uax:Float>123.45</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=3246f38f-b405-42ab-803b-cf17266d4ada" ParentNodeId="ns=1;g=57320128-e785-44bc-a2ef-f7ea8739e7dd" BrowseName="1:SetSpeed" WriteMask="594038" DataType="i=10" AccessLevel="0">
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=57320128-e785-44bc-a2ef-f7ea8739e7dd</Reference>
+    </References>
+    <Value>
+      <uax:Float>50</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=88115fc0-ed60-4212-9853-37ab2a42a189" ParentNodeId="ns=1;g=57320128-e785-44bc-a2ef-f7ea8739e7dd" BrowseName="1:CurrentSpeed" WriteMask="594038" DataType="i=10" AccessLevel="0">
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=57320128-e785-44bc-a2ef-f7ea8739e7dd</Reference>
+    </References>
+    <Value>
+      <uax:Float>47.5</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=5f8bb0f5-9c8d-48a3-a7d2-767d97ba58bb" ParentNodeId="ns=1;g=020323f9-ba78-48e2-a22c-c652626952f7" BrowseName="1:StatusText" WriteMask="594038" DataType="i=12" AccessLevel="0">
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=020323f9-ba78-48e2-a22c-c652626952f7</Reference>
+    </References>
+    <Value>
+      <uax:String>Created by DesignTime NetLogic</uax:String>
+    </Value>
+  </UAVariable>
+  <UAObject NodeId="ns=1;g=020323f9-ba78-48e2-a22c-c652626952f7" BrowseName="1:AI_NetLogicProbe_01" WriteMask="69876">
+    <References>
+      <Reference ReferenceType="i=40">i=58</Reference>
+    </References>
+  </UAObject>
+</UANodeSet>
