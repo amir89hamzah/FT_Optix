@@ -1,0 +1,34 @@
+Name: AI_YAMLProbe_01
+Type: FolderType
+Children:
+- Name: StatusText
+  Type: BaseDataVariableType
+  DataType: String
+  Value: "Hello from YAML project source"
+- Name: TestNumber
+  Type: BaseDataVariableType
+  DataType: Float
+  Value: 123.45
+- Name: TestBool
+  Type: BaseDataVariableType
+  DataType: Boolean
+  Value: true
+- Name: Notes
+  Type: BaseDataVariableType
+  DataType: String
+  Value: "Generated YAML probe. Added under Nodes/Model via File include."
+- Name: RuntimeData
+  Type: FolderType
+  Children:
+  - Name: SpeedPercent
+    Type: BaseDataVariableType
+    DataType: Float
+    Value: 75.5
+  - Name: Running
+    Type: BaseDataVariableType
+    DataType: Boolean
+    Value: true
+  - Name: LastMessage
+    Type: BaseDataVariableType
+    DataType: String
+    Value: "YAML probe runtime data loaded"
