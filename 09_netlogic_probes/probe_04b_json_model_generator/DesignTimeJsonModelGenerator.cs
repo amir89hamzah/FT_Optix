@@ -17,6 +17,7 @@ using FTOptix.Core;
 using FTOptix.HMIProject;
 using FTOptix.NetLogic;
 using UAManagedCore;
+using OpcUa = UAManagedCore.OpcUa;
 #endregion
 
 public class DesignTimeJsonModelGenerator : BaseNetLogic
@@ -110,7 +111,7 @@ public class DesignTimeJsonModelGenerator : BaseNetLogic
 
             var dataType = ResolveDataType(variableSpec.dataType);
             var variable = InformationModel.MakeVariable(variableSpec.name, dataType);
-            variable.Value = ConvertJsonValue(variableSpec.value, variableSpec.dataType);
+            SetVariableValue(variable, variableSpec.value, variableSpec.dataType);
             parent.Add(variable);
         }
     }
@@ -138,26 +139,33 @@ public class DesignTimeJsonModelGenerator : BaseNetLogic
         }
     }
 
-    private object ConvertJsonValue(JsonElement value, string dataType)
+    private void SetVariableValue(IUAVariable variable, JsonElement value, string dataType)
     {
         switch ((dataType ?? "String").Trim().ToLowerInvariant())
         {
             case "boolean":
             case "bool":
-                return value.ValueKind == JsonValueKind.True || (value.ValueKind == JsonValueKind.String && bool.Parse(value.GetString()));
+                variable.Value = value.ValueKind == JsonValueKind.True ||
+                                 (value.ValueKind == JsonValueKind.String && bool.Parse(value.GetString()));
+                break;
             case "float":
-                return value.ValueKind == JsonValueKind.Number ? value.GetSingle() : float.Parse(value.GetString());
+                variable.Value = value.ValueKind == JsonValueKind.Number ? value.GetSingle() : float.Parse(value.GetString());
+                break;
             case "double":
-                return value.ValueKind == JsonValueKind.Number ? value.GetDouble() : double.Parse(value.GetString());
+                variable.Value = value.ValueKind == JsonValueKind.Number ? value.GetDouble() : double.Parse(value.GetString());
+                break;
             case "int32":
             case "int":
-                return value.ValueKind == JsonValueKind.Number ? value.GetInt32() : int.Parse(value.GetString());
+                variable.Value = value.ValueKind == JsonValueKind.Number ? value.GetInt32() : int.Parse(value.GetString());
+                break;
             case "uint32":
             case "uint":
-                return value.ValueKind == JsonValueKind.Number ? value.GetUInt32() : uint.Parse(value.GetString());
+                variable.Value = value.ValueKind == JsonValueKind.Number ? value.GetUInt32() : uint.Parse(value.GetString());
+                break;
             case "string":
             default:
-                return value.ValueKind == JsonValueKind.String ? value.GetString() : value.ToString();
+                variable.Value = value.ValueKind == JsonValueKind.String ? value.GetString() : value.ToString();
+                break;
         }
     }
 
