@@ -2,7 +2,7 @@
 
 ## Status
 
-Result: **manual DesignTime NetLogic execution successful**.
+Result: **manual DesignTime NetLogic execution and export-back successful**.
 
 This probe pivots from XML-first generation to FT Optix native project generation through DesignTime NetLogic C#.
 
@@ -16,7 +16,7 @@ This probe tests the smallest useful case:
 Can a DesignTime NetLogic method create Model objects and variables natively?
 ```
 
-Result: yes, a DesignTime NetLogic method created an object and variables under `Model`.
+Result: yes, a DesignTime NetLogic method created an object and variables under `Model`, and the result exported back to NodeSet XML successfully.
 
 ## Manual verification observed
 
@@ -46,11 +46,71 @@ SetSpeed: Float = 50
 CurrentSpeed: Float = 47.5
 ```
 
+Selecting `AI_NetLogicProbe_01` showed the root variables in the properties panel:
+
+```text
+StatusText: String = Created by DesignTime NetLogic
+TestNumber: Float = 123.449997
+Running: Boolean = True
+```
+
 Note: FT Optix showed `Pump1` with the default Object icon. This is expected for a plain object created by `InformationModel.MakeObject(...)`. It is not a problem.
+
+## Export-back verification
+
+Export-back file:
+
+```text
+09_netlogic_probes/probe_04a_designtime_model_generator/exported_back_from_ftoptix.xml
+```
+
+The exported XML contains exactly the expected browse-path structure:
+
+```text
+AI_NetLogicProbe_01
+AI_NetLogicProbe_01/StatusText
+AI_NetLogicProbe_01/TestNumber
+AI_NetLogicProbe_01/Running
+AI_NetLogicProbe_01/Pump1
+AI_NetLogicProbe_01/Pump1/SetSpeed
+AI_NetLogicProbe_01/Pump1/CurrentSpeed
+```
+
+Exported node count:
+
+```text
+UAObject: 2
+UAVariable: 5
+Total: 7
+```
+
+Exported values:
+
+```text
+StatusText   String  Created by DesignTime NetLogic
+TestNumber   Float   123.45
+Running      Boolean true
+SetSpeed     Float   50
+CurrentSpeed Float   47.5
+```
+
+FT Optix normalized the project namespace to:
+
+```text
+NewHMIProject
+```
+
+and exported variables with:
+
+```text
+AccessLevel="0"
+```
+
+This matches previous export-back behavior from XML probes.
 
 ## Target generated structure
 
-The intended complete target structure is:
+The intended complete target structure was achieved:
 
 ```text
 Model
@@ -63,15 +123,14 @@ Model
       └─ CurrentSpeed
 ```
 
-At the time of recording, the key object/variable creation path was visually confirmed. The next check is to expand/select `AI_NetLogicProbe_01` and verify whether `StatusText`, `TestNumber`, and `Running` are present as root child variables.
-
 ## Files
 
 ```text
 DesignTimeModelGenerator.cs
+exported_back_from_ftoptix.xml
 ```
 
-This is a draft C# NetLogic body/template. It is not a standalone .NET console program. It must be copied into a FT Optix DesignTime NetLogic class or adapted to the class name created by FT Optix Studio.
+`DesignTimeModelGenerator.cs` is a draft C# NetLogic body/template. It is not a standalone .NET console program. It must be copied into a FT Optix DesignTime NetLogic class or adapted to the class name created by FT Optix Studio.
 
 ## Manual test steps
 
@@ -125,11 +184,11 @@ AI_NetLogicProbe_01
 
 ## What to record next
 
-Record:
+Record in a future probe:
 
-- Whether `StatusText`, `TestNumber`, and `Running` are present under `AI_NetLogicProbe_01`.
-- Whether export-back preserves the structure.
 - Whether repeated execution should overwrite, skip, or delete/recreate the generated node.
+- Whether JSON input can drive node creation.
+- Whether the same approach can create DynamicLinks, aliases, UI screens, panels, data loggers, recipes, and alarms.
 - Any errors from VS Code, C# SDK, NuGet, or FT Optix Studio.
 
 ## Expected outcome
