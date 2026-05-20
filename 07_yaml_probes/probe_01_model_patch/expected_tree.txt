@@ -1,0 +1,10 @@
+Model
+└─ AI_YAMLProbe_01
+   ├─ StatusText = "Hello from YAML project source"
+   ├─ TestNumber = 123.45
+   ├─ TestBool = true
+   ├─ Notes = "Generated YAML probe. Added under Nodes/Model via File include."
+   └─ RuntimeData
+      ├─ SpeedPercent = 75.5
+      ├─ Running = true
+      └─ LastMessage = "YAML probe runtime data loaded"
