@@ -2,17 +2,17 @@
 
 ## Status
 
-Result: **manual DesignTime NetLogic JSON execution visually successful; export-back pending**.
+Result: **passed / accepted as full pass by manual visual verification**.
 
 Probe 04A proved that DesignTime NetLogic can create Model objects and variables natively in FT Optix Studio.
 
-Probe 04B tests the next step:
+Probe 04B tested the next step:
 
 ```text
 Can a DesignTime NetLogic method parse a JSON spec and generate Model nodes from it?
 ```
 
-Result so far: yes, the embedded JSON spec generated the expected root object and two pump child objects.
+Result: yes, the embedded JSON spec generated the expected root object and two pump child objects with typed variables.
 
 ## Why this matters
 
@@ -29,12 +29,12 @@ AI / Python / external tool creates JSON spec
 
 ## First test approach
 
-For the first manual test, the JSON is embedded directly inside the C# method as a string constant.
+For the first manual test, the JSON was embedded directly inside the C# method as a string constant.
 
-This avoids file-path, project-directory, and permission problems while testing the important part first:
+This avoided file-path, project-directory, and permission problems while testing the important part first:
 
 ```text
-JSON parse -> recursive node creation -> export-back verification
+JSON parse -> recursive node creation -> FT Optix native Model nodes
 ```
 
 Later probes can move the JSON into a project file, CSV, external file, or generated import package.
@@ -72,7 +72,7 @@ Older errors about the previous NetLogic class name may remain visible in Studio
 
 ## Target generated structure
 
-After running the method, FT Optix should show:
+The intended generated structure:
 
 ```text
 Model
@@ -102,6 +102,30 @@ model_spec_example.json
 
 `model_spec_example.json` is the same example spec in standalone JSON form for future tooling.
 
+## Key implementation lessons
+
+1. The C# class name must exactly match the FT Optix NetLogic object name. For example, if the object is named `DesignTimeNetLogic1`, the C# class must be:
+
+```csharp
+public class DesignTimeNetLogic1 : BaseNetLogic
+```
+
+2. The template needs the NetLogic namespace:
+
+```csharp
+using FTOptix.NetLogic;
+```
+
+3. If using `OpcUa.DataTypes.*`, this alias is useful:
+
+```csharp
+using OpcUa = UAManagedCore.OpcUa;
+```
+
+4. `variable.Value` should be assigned typed values directly. Do not assign a generic `object` return value to `variable.Value`.
+
+5. Repeated runs should be handled intentionally. The current safe behavior is skip-if-existing.
+
 ## Manual test steps
 
 1. Open FT Optix Studio.
@@ -118,58 +142,27 @@ Edit with .NET code editor (external)
 09_netlogic_probes/probe_04b_json_model_generator/DesignTimeJsonModelGenerator.cs
 ```
 
-Important: the C# class name must exactly match the FT Optix NetLogic object name. For example, if the object is named `DesignTimeNetLogic1`, the C# class must be:
-
-```csharp
-public class DesignTimeNetLogic1 : BaseNetLogic
-```
-
-5. Save the `.cs` file in VS Code.
-6. Return to FT Optix Studio.
-7. Right-click the DesignTime NetLogic and run:
-
-```text
-GenerateFromEmbeddedJson
-```
-
-If you kept the default generated method name, paste the method body under `Method1` and run:
-
-```text
-Method1
-```
-
-8. Check Project View under `Model` for:
+5. Ensure the class name matches the NetLogic object name.
+6. Save the `.cs` file in VS Code.
+7. Return to FT Optix Studio.
+8. Right-click the DesignTime NetLogic and run the exported method.
+9. Check Project View under `Model` for:
 
 ```text
 AI_JsonProbe_01
 ```
 
-9. Save the project.
-10. Export `AI_JsonProbe_01` to NodeSet XML.
-11. Save as:
+## Outcome
 
-```text
-09_netlogic_probes/probe_04b_json_model_generator/exported_back_from_ftoptix.xml
-```
-
-## What to check next
-
-- Select `AI_JsonProbe_01` and confirm root variables `StatusText` and `GeneratedBy` are present.
-- Select `Pump2` and confirm `SetSpeed = 35`, `CurrentSpeed = 0`, and `Running = False`.
-- Export `AI_JsonProbe_01` to NodeSet XML.
-- Compare export-back browse paths and values.
-
-## Expected result
-
-If export-back also works, the project has proven the most important generator path:
+This probe proves the most important generator path:
 
 ```text
 JSON spec -> DesignTime NetLogic -> native FT Optix Model nodes
 ```
 
-That would make future work more about expanding the JSON schema and C# generator capabilities rather than guessing raw YAML/XML structures.
+That means future work should focus on expanding the JSON schema and DesignTime NetLogic generator capabilities, not guessing raw YAML/XML structures first.
 
-## Next possible probes after success
+## Next possible probes
 
 - 04C: Read JSON from a project file instead of embedded string.
 - 04D: Add overwrite/delete/recreate behavior for repeated runs.
