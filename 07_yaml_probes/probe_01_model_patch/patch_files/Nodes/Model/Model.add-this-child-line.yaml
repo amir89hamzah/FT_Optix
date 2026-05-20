@@ -1,0 +1,7 @@
+# This is not a complete replacement file unless your Model.yaml has no Children yet.
+# Add the File line below into Nodes/Model/Model.yaml under Children.
+
+Name: Model
+Type: ModelCategoryFolder
+Children:
+- File: AI_YAMLProbe_01/AI_YAMLProbe_01.yaml
