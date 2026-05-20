@@ -1,0 +1,57 @@
+{
+  "rootName": "AI_JsonProbe_01",
+  "variables": [
+    {
+      "name": "StatusText",
+      "dataType": "String",
+      "value": "Created from embedded JSON spec"
+    },
+    {
+      "name": "GeneratedBy",
+      "dataType": "String",
+      "value": "DesignTime NetLogic"
+    }
+  ],
+  "objects": [
+    {
+      "name": "Pump1",
+      "variables": [
+        {
+          "name": "SetSpeed",
+          "dataType": "Float",
+          "value": 50.0
+        },
+        {
+          "name": "CurrentSpeed",
+          "dataType": "Float",
+          "value": 47.5
+        },
+        {
+          "name": "Running",
+          "dataType": "Boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "name": "Pump2",
+      "variables": [
+        {
+          "name": "SetSpeed",
+          "dataType": "Float",
+          "value": 35.0
+        },
+        {
+          "name": "CurrentSpeed",
+          "dataType": "Float",
+          "value": 0.0
+        },
+        {
+          "name": "Running",
+          "dataType": "Boolean",
+          "value": false
+        }
+      ]
+    }
+  ]
+}
