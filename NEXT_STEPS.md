@@ -9,7 +9,7 @@ Confirmed by manual test:
 - Probe 01: success
 - Probe 02: success
 - Probe 03: success, exported back and compared
-- Probe 04: generated, next manual test
+- Probe 04 XML: generated, but now secondary / hold while DesignTime NetLogic path is evaluated
 
 A BoilerDemo reference sample was reviewed from a `Nodes.zip` export plus runtime screenshots. The raw sample should not be committed until sanitized, but the observed patterns are useful as ground truth for future probes. See:
 
@@ -17,43 +17,74 @@ A BoilerDemo reference sample was reviewed from a `Nodes.zip` export plus runtim
 00_notes/boilerdemo_reference_review.md
 ```
 
-## Immediate actions
+NetLogic / C# API and tooling notes from Rockwell Knowledgebase PDFs were also recorded. See:
 
-1. Run the generator:
-
-```bash
-python 05_scripts/generate_probes.py
+```text
+00_notes/netlogic_csharp_api_and_tooling_notes.md
 ```
 
-2. For the next manual test, prioritize:
+## Strategy update
+
+The current best automation strategy is:
+
+```text
+DesignTime NetLogic C# API  -> primary project-generation path
+NodeSet XML import/export   -> verification and regression-test path
+YAML project files          -> pattern research and diff/reference path
+```
+
+Reason:
+
+- XML import/export has proven useful for Model-folder structure verification.
+- YAML is excellent for learning FT Optix project patterns from real samples, but direct manual editing may be fragile.
+- FT Optix C# / NetLogic supports `.NET 6` bindings and additional NuGet packages, and examples/snippets are available from the FactoryTalk Optix GitHub resources.
+- NetLogic tooling may require VS Code / C# / .NET / NuGet setup and may hit cache or NuGet restore issues on some machines.
+
+## Immediate actions
+
+Prioritize a new DesignTime NetLogic probe before continuing deeper XML probes.
+
+### Probe 04A - DesignTime NetLogic model generator
+
+Goal:
+
+```text
+Run a DesignTime NetLogic method inside FT Optix Studio that creates Model nodes natively.
+```
+
+Target generated structure:
+
+```text
+Model
+└─ AI_NetLogicProbe_01
+   ├─ StatusText
+   ├─ TestNumber
+   ├─ Running
+   └─ Pump1
+      ├─ SetSpeed
+      └─ CurrentSpeed
+```
+
+Manual test plan:
+
+1. Create or locate a DesignTime NetLogic in FT Optix Studio.
+2. Edit it using the external .NET code editor.
+3. Add an exported method such as `GenerateModelProbe()`.
+4. Use C# API calls to create a folder/object and variables under `Model`.
+5. Run the method from Studio.
+6. Save the project.
+7. Export the generated node back to NodeSet XML.
+8. Compare the exported XML against the expected browse-path structure.
+
+## Optional XML action
+
+Probe 04 XML is still available:
 
 ```text
 04_generated/AI_ModelProbe_04_PumpObjectType.xml
 ```
 
-3. Import Probe 04 into FT Optix under the `Model` folder.
-
-4. Check whether the import accepts the custom object type and object instances:
-
-```text
-AI_MyPump : BaseObjectType
-AI_ModelProbe_04/Pumps/Pump1
-AI_ModelProbe_04/Pumps/Pump2
-```
-
-5. Export the imported Probe 04 node back from FT Optix.
-
-6. Save exported-back XML into:
-
-```text
-02_probes/probe_04_pump_object_type/exported_back_from_ftoptix.xml
-```
-
-7. Record the result in:
-
-```text
-02_probes/probe_04_pump_object_type/README.md
-```
+It can be tested later to check whether FT Optix accepts `UAObjectType` and object instances through NodeSet XML import. This is useful, but less important than proving DesignTime NetLogic generation.
 
 ## Last completed verification
 
@@ -70,26 +101,55 @@ UAVariables: 79
 
 FT Optix preserved all browse paths, structure, data types, values, and descriptions. FT Optix normalized namespace URI, model URI, node IDs, and access-level attributes on export.
 
-## BoilerDemo-informed next probes
+## BoilerDemo-informed future probes
 
-The BoilerDemo sample suggests changing the future probe sequence slightly. Focus on small Model and binding patterns before full UI generation.
+Focus on small Model and binding patterns before full UI generation.
 
-- Probe 04: Model object type / instance pattern based on `Model/Pumps` (`MyPump`, `Pump1`, speed/command/alarm variables). **Generated, pending import-export test.**
+- Probe 04A: DesignTime NetLogic creates Model nodes. **Next priority.**
+- Probe 04B: XML object type / instance pattern based on `Model/Pumps`. **Generated, secondary.**
 - Probe 05: recipe target model pattern based on `Model/Recipes` plus later `Recipes/RecipeSchema`.
 - Probe 06: datalogger-ready model variables and `VariablesToLog` / datastore pattern.
 - Probe 07: alarm controller pattern using `InputValue`, `DynamicLink`, `Message`, and `Severity`.
 - Probe 08: simple navigation/screen pattern based on `NavigationPanelItem` only after Model/binding patterns are stable.
 
+## Tooling checks for NetLogic machines
+
+Before serious DesignTime NetLogic work, verify:
+
+```text
+FactoryTalk Optix Studio installed
+Visual Studio Code installed
+C# extension installed
+.NET Install Tool installed
+C# Snippets installed
+NuGet Package Manager GUI installed
+NuGet/network/proxy works if packages must be restored
+```
+
+Known failure types from Rockwell Knowledgebase:
+
+```text
+NU1301: Unable to load service index from nuget.org
+NU1100: Unable to resolve Microsoft.NETCore.App.Ref / WindowsDesktop.App.Ref / AspNetCore.App.Ref for net6.0
+```
+
+Known cleanup actions:
+
+```text
+Clear VS Code cache folders under AppData/Roaming/Code
+Delete AppData/Roaming/NuGet/NuGet.config
+```
+
 ## Things to verify
 
+- Whether FT Optix has any official external SDK equivalent to Studio 5000 LDSDK. Current evidence still points to NetLogic rather than a full external SDK.
+- Whether DesignTime NetLogic can create all required objects: screens, panels, navigation, dataloggers, recipes, alarms, dynamic links, and aliases.
+- Whether a DesignTime NetLogic can import a JSON spec generated by AI and create a project structure safely.
 - Whether FT Optix accepts a minimal `UAObjectType` through NodeSet XML import.
 - Whether imported `UAObject` instances preserve a custom `HasTypeDefinition` after export.
 - Which FT Optix YAML fields are required vs generated automatically by Studio.
-- Whether a minimal `Nodes/Model/...yaml` pattern can be manually added and opened safely by Studio.
-- Which patterns should be generated as XML imports under `Model`, and which require project YAML editing.
 - How FT Optix normalizes `DynamicLink` paths after save/export.
-- What is the smallest possible UI screen/navigation node set that Studio accepts.
 
 ## Rule
 
-Do not rush into full dashboard XML. FT Optix XML generation should be built by small passing probes.
+Do not rush into full dashboard XML. FT Optix generation should be built by small passing probes, with DesignTime NetLogic now treated as the likely primary automation route.
