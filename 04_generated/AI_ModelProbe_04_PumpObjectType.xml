@@ -1,0 +1,293 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<UANodeSet xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd" xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd">
+  <NamespaceUris>
+    <Uri>AI_Generated_FTOptix_Test</Uri>
+  </NamespaceUris>
+  <Models>
+    <Model ModelUri="AI_Generated_FTOptix_Test">
+      <RequiredModel ModelUri="http://opcfoundation.org/UA/" />
+    </Model>
+  </Models>
+  <Aliases />
+  <UAObjectType NodeId="ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e" BrowseName="1:AI_MyPump" WriteMask="0" IsAbstract="false">
+    <DisplayName>AI_MyPump</DisplayName>
+    <Description>Minimal generated pump object type for FT Optix import probing.</Description>
+    <References>
+      <Reference ReferenceType="i=45" IsForward="false">i=58</Reference>
+    </References>
+  </UAObjectType>
+  <UAVariable NodeId="ns=1;g=bfcafde4-0e86-5491-b127-3a5f7930cd35" BrowseName="1:SetSpeed" ParentNodeId="ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e" WriteMask="594038" DataType="i=10" AccessLevel="3" UserAccessLevel="3">
+    <DisplayName>SetSpeed</DisplayName>
+    <Description>Requested pump speed percentage.</Description>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e</Reference>
+      <Reference ReferenceType="i=37">i=78</Reference>
+    </References>
+    <Value>
+      <uax:Float>0</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=61313233-2733-597c-a4ba-ecdb95c3eba2" BrowseName="1:CurrentSpeed" ParentNodeId="ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e" WriteMask="594038" DataType="i=10" AccessLevel="3" UserAccessLevel="3">
+    <DisplayName>CurrentSpeed</DisplayName>
+    <Description>Measured pump speed percentage.</Description>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e</Reference>
+      <Reference ReferenceType="i=37">i=78</Reference>
+    </References>
+    <Value>
+      <uax:Float>0</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=03d09822-bb18-5ca7-b8e1-55cecf806cb8" BrowseName="1:Command" ParentNodeId="ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e" WriteMask="594038" DataType="i=12" AccessLevel="3" UserAccessLevel="3">
+    <DisplayName>Command</DisplayName>
+    <Description>Simple command text for probe testing.</Description>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e</Reference>
+      <Reference ReferenceType="i=37">i=78</Reference>
+    </References>
+    <Value>
+      <uax:String>Stop</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=c5d0fa5a-f5df-53f3-bad1-502073223335" BrowseName="1:Alarm" ParentNodeId="ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e" WriteMask="594038" DataType="i=1" AccessLevel="3" UserAccessLevel="3">
+    <DisplayName>Alarm</DisplayName>
+    <Description>Pump alarm state.</Description>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e</Reference>
+      <Reference ReferenceType="i=37">i=78</Reference>
+    </References>
+    <Value>
+      <uax:Boolean>false</uax:Boolean>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=62a6f47c-7ca0-549e-ba65-d0a0abbf3d79" BrowseName="1:MinSpeed" ParentNodeId="ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e" WriteMask="594038" DataType="i=10" AccessLevel="3" UserAccessLevel="3">
+    <DisplayName>MinSpeed</DisplayName>
+    <Description>Minimum allowed speed.</Description>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e</Reference>
+      <Reference ReferenceType="i=37">i=78</Reference>
+    </References>
+    <Value>
+      <uax:Float>0</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=af15bbbb-dbbb-56b5-a635-e61160357db9" BrowseName="1:MaxSpeed" ParentNodeId="ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e" WriteMask="594038" DataType="i=10" AccessLevel="3" UserAccessLevel="3">
+    <DisplayName>MaxSpeed</DisplayName>
+    <Description>Maximum allowed speed.</Description>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e</Reference>
+      <Reference ReferenceType="i=37">i=78</Reference>
+    </References>
+    <Value>
+      <uax:Float>100</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=843e558d-e74b-5df3-bd9e-bcabbdffc13d" BrowseName="1:UseRunFeedback" ParentNodeId="ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e" WriteMask="594038" DataType="i=1" AccessLevel="3" UserAccessLevel="3">
+    <DisplayName>UseRunFeedback</DisplayName>
+    <Description>Whether run feedback is expected.</Description>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e</Reference>
+      <Reference ReferenceType="i=37">i=78</Reference>
+    </References>
+    <Value>
+      <uax:Boolean>true</uax:Boolean>
+    </Value>
+  </UAVariable>
+  <UAObject NodeId="ns=1;g=2e49bc6f-e759-5a46-a16c-245c0c668004" BrowseName="1:AI_ModelProbe_04" WriteMask="69876">
+    <DisplayName>AI_ModelProbe_04</DisplayName>
+    <Description>Object type and instance probe based on the BoilerDemo pump pattern.</Description>
+    <References>
+      <Reference ReferenceType="i=40">i=61</Reference>
+    </References>
+  </UAObject>
+  <UAVariable NodeId="ns=1;g=7409d9c8-b40c-5670-9eed-e047c6e41766" BrowseName="1:ImportStatus" WriteMask="594038" DataType="i=12" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=2e49bc6f-e759-5a46-a16c-245c0c668004">
+    <DisplayName>ImportStatus</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=2e49bc6f-e759-5a46-a16c-245c0c668004</Reference>
+    </References>
+    <Value>
+      <uax:String>AI_ModelProbe_04 imported successfully</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=b201e105-a68f-56c6-a7a6-b18cf7f70d8e" BrowseName="1:ProbeVersion" WriteMask="594038" DataType="i=12" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=2e49bc6f-e759-5a46-a16c-245c0c668004">
+    <DisplayName>ProbeVersion</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=2e49bc6f-e759-5a46-a16c-245c0c668004</Reference>
+    </References>
+    <Value>
+      <uax:String>04 - model object type and instance</uax:String>
+    </Value>
+  </UAVariable>
+  <UAObject NodeId="ns=1;g=c7601d4f-9b49-5428-a699-1b76a1fbd46f" BrowseName="1:Pumps" WriteMask="69876" ParentNodeId="ns=1;g=2e49bc6f-e759-5a46-a16c-245c0c668004">
+    <DisplayName>Pumps</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=61</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=2e49bc6f-e759-5a46-a16c-245c0c668004</Reference>
+    </References>
+  </UAObject>
+  <UAObject NodeId="ns=1;g=35f4173c-7bd8-5120-a0b1-ae53aab792f1" BrowseName="1:Pump1" WriteMask="69876" ParentNodeId="ns=1;g=c7601d4f-9b49-5428-a699-1b76a1fbd46f">
+    <DisplayName>Pump1</DisplayName>
+    <Description>Pump1 instance of generated AI_MyPump object type.</Description>
+    <References>
+      <Reference ReferenceType="i=40">ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=c7601d4f-9b49-5428-a699-1b76a1fbd46f</Reference>
+    </References>
+  </UAObject>
+  <UAVariable NodeId="ns=1;g=f99fb7ba-8f79-51d1-9d2e-3182df84ae8f" BrowseName="1:SetSpeed" WriteMask="594038" DataType="i=10" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=35f4173c-7bd8-5120-a0b1-ae53aab792f1">
+    <DisplayName>SetSpeed</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=35f4173c-7bd8-5120-a0b1-ae53aab792f1</Reference>
+    </References>
+    <Value>
+      <uax:Float>50</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=98306f5a-1dee-576a-8e90-f4066ec277e1" BrowseName="1:CurrentSpeed" WriteMask="594038" DataType="i=10" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=35f4173c-7bd8-5120-a0b1-ae53aab792f1">
+    <DisplayName>CurrentSpeed</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=35f4173c-7bd8-5120-a0b1-ae53aab792f1</Reference>
+    </References>
+    <Value>
+      <uax:Float>47.5</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=5beb532d-987f-597f-bfde-b2522909b1a3" BrowseName="1:Command" WriteMask="594038" DataType="i=12" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=35f4173c-7bd8-5120-a0b1-ae53aab792f1">
+    <DisplayName>Command</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=35f4173c-7bd8-5120-a0b1-ae53aab792f1</Reference>
+    </References>
+    <Value>
+      <uax:String>RunCw</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=6c6d813f-2b14-51a0-ad15-ccdc427f085b" BrowseName="1:Alarm" WriteMask="594038" DataType="i=1" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=35f4173c-7bd8-5120-a0b1-ae53aab792f1">
+    <DisplayName>Alarm</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=35f4173c-7bd8-5120-a0b1-ae53aab792f1</Reference>
+    </References>
+    <Value>
+      <uax:Boolean>false</uax:Boolean>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=70b3cc31-2e47-5c92-a5ed-8964c8642276" BrowseName="1:MinSpeed" WriteMask="594038" DataType="i=10" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=35f4173c-7bd8-5120-a0b1-ae53aab792f1">
+    <DisplayName>MinSpeed</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=35f4173c-7bd8-5120-a0b1-ae53aab792f1</Reference>
+    </References>
+    <Value>
+      <uax:Float>0</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=a8b7e19a-b400-59c7-8f72-34f6be4feb4c" BrowseName="1:MaxSpeed" WriteMask="594038" DataType="i=10" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=35f4173c-7bd8-5120-a0b1-ae53aab792f1">
+    <DisplayName>MaxSpeed</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=35f4173c-7bd8-5120-a0b1-ae53aab792f1</Reference>
+    </References>
+    <Value>
+      <uax:Float>100</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=a2b4c8e4-6b16-52ae-9a9f-ee20741d3be8" BrowseName="1:UseRunFeedback" WriteMask="594038" DataType="i=1" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=35f4173c-7bd8-5120-a0b1-ae53aab792f1">
+    <DisplayName>UseRunFeedback</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=35f4173c-7bd8-5120-a0b1-ae53aab792f1</Reference>
+    </References>
+    <Value>
+      <uax:Boolean>true</uax:Boolean>
+    </Value>
+  </UAVariable>
+  <UAObject NodeId="ns=1;g=42194edf-337b-591d-a74d-647c17f11867" BrowseName="1:Pump2" WriteMask="69876" ParentNodeId="ns=1;g=c7601d4f-9b49-5428-a699-1b76a1fbd46f">
+    <DisplayName>Pump2</DisplayName>
+    <Description>Pump2 instance of generated AI_MyPump object type.</Description>
+    <References>
+      <Reference ReferenceType="i=40">ns=1;g=a488b842-aa2f-598c-9aa4-70dd345cc60e</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=c7601d4f-9b49-5428-a699-1b76a1fbd46f</Reference>
+    </References>
+  </UAObject>
+  <UAVariable NodeId="ns=1;g=f64b3b77-95cc-592d-962c-4107c42659ce" BrowseName="1:SetSpeed" WriteMask="594038" DataType="i=10" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=42194edf-337b-591d-a74d-647c17f11867">
+    <DisplayName>SetSpeed</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=42194edf-337b-591d-a74d-647c17f11867</Reference>
+    </References>
+    <Value>
+      <uax:Float>35</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=070718f5-aef6-5741-8c6f-0383635e95c1" BrowseName="1:CurrentSpeed" WriteMask="594038" DataType="i=10" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=42194edf-337b-591d-a74d-647c17f11867">
+    <DisplayName>CurrentSpeed</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=42194edf-337b-591d-a74d-647c17f11867</Reference>
+    </References>
+    <Value>
+      <uax:Float>0</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=c45274e5-032f-5a3a-8d0e-e453fbdd64e6" BrowseName="1:Command" WriteMask="594038" DataType="i=12" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=42194edf-337b-591d-a74d-647c17f11867">
+    <DisplayName>Command</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=42194edf-337b-591d-a74d-647c17f11867</Reference>
+    </References>
+    <Value>
+      <uax:String>Stop</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=0e4b5862-9092-5f98-be25-522f5d65460c" BrowseName="1:Alarm" WriteMask="594038" DataType="i=1" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=42194edf-337b-591d-a74d-647c17f11867">
+    <DisplayName>Alarm</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=42194edf-337b-591d-a74d-647c17f11867</Reference>
+    </References>
+    <Value>
+      <uax:Boolean>true</uax:Boolean>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=7d40e64b-c07e-5005-a718-ea67f7146dc7" BrowseName="1:MinSpeed" WriteMask="594038" DataType="i=10" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=42194edf-337b-591d-a74d-647c17f11867">
+    <DisplayName>MinSpeed</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=42194edf-337b-591d-a74d-647c17f11867</Reference>
+    </References>
+    <Value>
+      <uax:Float>0</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=41ccf631-7538-58db-a4b5-5fd1d9007741" BrowseName="1:MaxSpeed" WriteMask="594038" DataType="i=10" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=42194edf-337b-591d-a74d-647c17f11867">
+    <DisplayName>MaxSpeed</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=42194edf-337b-591d-a74d-647c17f11867</Reference>
+    </References>
+    <Value>
+      <uax:Float>100</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=cb68027c-9439-5071-b9f7-a572c668c940" BrowseName="1:UseRunFeedback" WriteMask="594038" DataType="i=1" AccessLevel="3" UserAccessLevel="3" ParentNodeId="ns=1;g=42194edf-337b-591d-a74d-647c17f11867">
+    <DisplayName>UseRunFeedback</DisplayName>
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=42194edf-337b-591d-a74d-647c17f11867</Reference>
+    </References>
+    <Value>
+      <uax:Boolean>true</uax:Boolean>
+    </Value>
+  </UAVariable>
+</UANodeSet>
