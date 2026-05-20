@@ -2,7 +2,7 @@
 
 ## Status
 
-Result: **planned / ready for manual DesignTime NetLogic test**.
+Result: **manual DesignTime NetLogic execution successful**.
 
 This probe pivots from XML-first generation to FT Optix native project generation through DesignTime NetLogic C#.
 
@@ -16,9 +16,41 @@ This probe tests the smallest useful case:
 Can a DesignTime NetLogic method create Model objects and variables natively?
 ```
 
+Result: yes, a DesignTime NetLogic method created an object and variables under `Model`.
+
+## Manual verification observed
+
+A DesignTime NetLogic was created in FT Optix Studio and edited with VS Code.
+
+The method was executed from FT Optix Studio using:
+
+```text
+Right-click DesignTimeNetLogic1 -> Execute Method
+```
+
+Observed generated structure in Project View:
+
+```text
+Model
+└─ AI_NetLogicProbe_01
+   └─ Pump1
+      ├─ SetSpeed
+      └─ CurrentSpeed
+```
+
+The properties panel for `Pump1` showed:
+
+```text
+Type: Object
+SetSpeed: Float = 50
+CurrentSpeed: Float = 47.5
+```
+
+Note: FT Optix showed `Pump1` with the default Object icon. This is expected for a plain object created by `InformationModel.MakeObject(...)`. It is not a problem.
+
 ## Target generated structure
 
-After running the method, FT Optix should show:
+The intended complete target structure is:
 
 ```text
 Model
@@ -30,6 +62,8 @@ Model
       ├─ SetSpeed
       └─ CurrentSpeed
 ```
+
+At the time of recording, the key object/variable creation path was visually confirmed. The next check is to expand/select `AI_NetLogicProbe_01` and verify whether `StatusText`, `TestNumber`, and `Running` are present as root child variables.
 
 ## Files
 
@@ -69,6 +103,12 @@ Edit with .NET code editor (external)
 GenerateModelProbe
 ```
 
+If using the default generated method name, run:
+
+```text
+Method1
+```
+
 9. Check Project View under `Model` for:
 
 ```text
@@ -83,20 +123,18 @@ AI_NetLogicProbe_01
 09_netlogic_probes/probe_04a_designtime_model_generator/exported_back_from_ftoptix.xml
 ```
 
-## What to record
+## What to record next
 
 Record:
 
-- Whether the code compiled.
-- Whether the exported method appeared in FT Optix Studio.
-- Whether running it created the Model nodes.
-- Whether values and data types were correct.
-- Whether export-back preserved the structure.
+- Whether `StatusText`, `TestNumber`, and `Running` are present under `AI_NetLogicProbe_01`.
+- Whether export-back preserves the structure.
+- Whether repeated execution should overwrite, skip, or delete/recreate the generated node.
 - Any errors from VS Code, C# SDK, NuGet, or FT Optix Studio.
 
 ## Expected outcome
 
-If this works, DesignTime NetLogic becomes the preferred path for future generation:
+This result supports making DesignTime NetLogic the preferred path for future generation:
 
 ```text
 AI / JSON spec
@@ -107,4 +145,4 @@ AI / JSON spec
 
 ## Fallback
 
-If the NetLogic tooling is not ready on the current PC, do not block the project. Continue using XML import/export probes while preparing a proper FT Optix + VS Code + .NET workstation.
+If the NetLogic tooling is not ready on a machine, do not block the project. Continue using XML import/export probes while preparing a proper FT Optix + VS Code + .NET workstation.
