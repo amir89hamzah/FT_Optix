@@ -1,0 +1,83 @@
+{
+  "generationMode": "deleteAndRecreate",
+  "rootName": "AI_JsonFileProbe_01",
+  "variables": [
+    {
+      "name": "StatusText",
+      "dataType": "String",
+      "value": "Recreated from C:\\Temp\\ftoptix_model_spec.json"
+    },
+    {
+      "name": "GeneratedBy",
+      "dataType": "String",
+      "value": "DesignTime NetLogic recreate mode"
+    },
+    {
+      "name": "GenerationMode",
+      "dataType": "String",
+      "value": "deleteAndRecreate"
+    }
+  ],
+  "objects": [
+    {
+      "name": "PumpA",
+      "variables": [
+        {
+          "name": "SetSpeed",
+          "dataType": "Float",
+          "value": 75.0
+        },
+        {
+          "name": "CurrentSpeed",
+          "dataType": "Float",
+          "value": 73.2
+        },
+        {
+          "name": "Running",
+          "dataType": "Boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "name": "PumpB",
+      "variables": [
+        {
+          "name": "SetSpeed",
+          "dataType": "Float",
+          "value": 10.0
+        },
+        {
+          "name": "CurrentSpeed",
+          "dataType": "Float",
+          "value": 0.0
+        },
+        {
+          "name": "Running",
+          "dataType": "Boolean",
+          "value": false
+        }
+      ]
+    },
+    {
+      "name": "PumpC",
+      "variables": [
+        {
+          "name": "SetSpeed",
+          "dataType": "Float",
+          "value": 40.0
+        },
+        {
+          "name": "CurrentSpeed",
+          "dataType": "Float",
+          "value": 39.5
+        },
+        {
+          "name": "Running",
+          "dataType": "Boolean",
+          "value": true
+        }
+      ]
+    }
+  ]
+}
