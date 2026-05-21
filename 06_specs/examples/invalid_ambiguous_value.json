@@ -1,0 +1,22 @@
+{
+  "specVersion": "0.5a",
+  "probe": "Probe 05A - tag-backed variables",
+  "rootName": "AI_TagSchemaProbe_Invalid",
+  "objects": [
+    {
+      "name": "PumpA",
+      "variables": [
+        {
+          "name": "CurrentSpeed",
+          "dataType": "Float",
+          "role": "measured",
+          "value": 78.4,
+          "display": {
+            "unit": "Hz",
+            "decimals": 1
+          }
+        }
+      ]
+    }
+  ]
+}
