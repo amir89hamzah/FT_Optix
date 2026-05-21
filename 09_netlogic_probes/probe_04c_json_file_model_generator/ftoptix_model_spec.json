@@ -1,0 +1,57 @@
+{
+  "rootName": "AI_JsonFileProbe_01",
+  "variables": [
+    {
+      "name": "StatusText",
+      "dataType": "String",
+      "value": "Created from C:\\Temp\\ftoptix_model_spec.json"
+    },
+    {
+      "name": "GeneratedBy",
+      "dataType": "String",
+      "value": "DesignTime NetLogic file reader"
+    }
+  ],
+  "objects": [
+    {
+      "name": "PumpA",
+      "variables": [
+        {
+          "name": "SetSpeed",
+          "dataType": "Float",
+          "value": 60.0
+        },
+        {
+          "name": "CurrentSpeed",
+          "dataType": "Float",
+          "value": 58.5
+        },
+        {
+          "name": "Running",
+          "dataType": "Boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "name": "PumpB",
+      "variables": [
+        {
+          "name": "SetSpeed",
+          "dataType": "Float",
+          "value": 25.0
+        },
+        {
+          "name": "CurrentSpeed",
+          "dataType": "Float",
+          "value": 0.0
+        },
+        {
+          "name": "Running",
+          "dataType": "Boolean",
+          "value": false
+        }
+      ]
+    }
+  ]
+}
