@@ -1,0 +1,16 @@
+{
+  "generationMode": "skip",
+  "rootName": "AI_InvalidProbe_UnknownDataType",
+  "objects": [
+    {
+      "name": "Pump1",
+      "variables": [
+        {
+          "name": "SetSpeed",
+          "dataType": "Real",
+          "value": 50.0
+        }
+      ]
+    }
+  ]
+}
