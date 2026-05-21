@@ -1,0 +1,116 @@
+{
+  "specVersion": "0.5a",
+  "probe": "Probe 05A - tag-backed variables",
+  "rootName": "AI_TagSchemaProbe_01",
+  "description": "Probe 05A example: variables explicitly declare plcTag, mock, or static source intent.",
+  "objects": [
+    {
+      "name": "PumpA",
+      "description": "Pump object with PLC-backed process values and one static label.",
+      "variables": [
+        {
+          "name": "CurrentSpeed",
+          "dataType": "Float",
+          "role": "measured",
+          "source": {
+            "kind": "plcTag",
+            "tag": "PumpA.CurrentSpeed",
+            "mode": "read"
+          },
+          "display": {
+            "unit": "Hz",
+            "decimals": 1
+          }
+        },
+        {
+          "name": "SetSpeed",
+          "dataType": "Float",
+          "role": "setpoint",
+          "source": {
+            "kind": "plcTag",
+            "tag": "PumpA.SetSpeed",
+            "mode": "readWrite"
+          },
+          "display": {
+            "unit": "Hz",
+            "decimals": 1,
+            "min": 0,
+            "max": 100
+          }
+        },
+        {
+          "name": "Running",
+          "dataType": "Boolean",
+          "role": "status",
+          "source": {
+            "kind": "plcTag",
+            "tag": "PumpA.Running",
+            "mode": "read"
+          }
+        },
+        {
+          "name": "OperatorCommand",
+          "dataType": "String",
+          "role": "command",
+          "source": {
+            "kind": "plcTag",
+            "tag": "PumpA.OperatorCommand",
+            "mode": "write"
+          }
+        },
+        {
+          "name": "DisplayName",
+          "dataType": "String",
+          "role": "config",
+          "source": {
+            "kind": "static",
+            "value": "Pump A"
+          }
+        }
+      ]
+    },
+    {
+      "name": "PumpB",
+      "description": "Pump object using mock values so Probe 05A can be tested without FT Echo or a PLC.",
+      "variables": [
+        {
+          "name": "CurrentSpeed",
+          "dataType": "Float",
+          "role": "measured",
+          "source": {
+            "kind": "mock",
+            "value": 78.4
+          },
+          "display": {
+            "unit": "Hz",
+            "decimals": 1
+          }
+        },
+        {
+          "name": "SetSpeed",
+          "dataType": "Float",
+          "role": "setpoint",
+          "source": {
+            "kind": "mock",
+            "value": 80.0
+          },
+          "display": {
+            "unit": "Hz",
+            "decimals": 1,
+            "min": 0,
+            "max": 100
+          }
+        },
+        {
+          "name": "Running",
+          "dataType": "Boolean",
+          "role": "status",
+          "source": {
+            "kind": "mock",
+            "value": true
+          }
+        }
+      ]
+    }
+  ]
+}
