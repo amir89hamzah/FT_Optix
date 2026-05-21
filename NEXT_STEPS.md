@@ -12,6 +12,7 @@ Confirmed by manual test:
 - Probe 04 XML: generated, but now secondary / hold while DesignTime NetLogic path is evaluated
 - Probe 04A-04E: DesignTime NetLogic JSON generation path was explored manually; it proved the engine direction but exposed the need to avoid ambiguous constant runtime values
 - Probe 05A: JSON schema hardening for tag-backed variables has started
+- Probe 05B: DesignTime NetLogic template added to generate Model nodes and preserve source intent metadata, but manual FT Optix test is still pending
 
 A BoilerDemo reference sample was reviewed from a `Nodes.zip` export plus runtime screenshots. The raw sample should not be committed until sanitized, but the observed patterns are useful as ground truth for future probes. See:
 
@@ -29,6 +30,12 @@ Probe 05A schema hardening notes are recorded here:
 
 ```text
 00_notes/probe_05a_json_schema_hardening.md
+```
+
+Probe 05B DesignTime NetLogic template is recorded here:
+
+```text
+09_netlogic_probes/probe_05b_tag_metadata_generator/
 ```
 
 ## Strategy update
@@ -53,7 +60,7 @@ Reason:
 
 ## Immediate actions
 
-Prioritize Probe 05A before deeper Recipe/Datalogger/Alarm/UI probes.
+Prioritize a manual Probe 05B test in FT Optix before deeper Recipe/Datalogger/Alarm/UI probes.
 
 ### Probe 05A - JSON schema hardening for tag-backed variables
 
@@ -99,12 +106,34 @@ source.kind = static
 
 ### Probe 05B - Preserve source intent in generated FT Optix Model nodes
 
-Next after Probe 05A passes.
+Current template:
+
+```text
+09_netlogic_probes/probe_05b_tag_metadata_generator/DesignTimeTagMetadataGenerator.cs
+```
 
 Goal:
 
 ```text
 Use DesignTime NetLogic to read the hardened JSON and create Model variables while preserving source intent as metadata/helper variables, without creating real DynamicLinks yet.
+```
+
+Manual test input path expected by the template:
+
+```text
+C:\Temp\ftoptix_probe05b_tag_backed_variables.json
+```
+
+Copy this repo file to that path before running the method:
+
+```text
+06_specs/examples/valid_tag_backed_variables.json
+```
+
+Method to run in FT Optix:
+
+```text
+GenerateTagMetadataModel()
 ```
 
 Example generated structure:
@@ -114,13 +143,17 @@ Model
 └─ AI_TagSchemaProbe_01
    ├─ PumpA
    │  ├─ CurrentSpeed
+   │  ├─ CurrentSpeed_Role
    │  ├─ CurrentSpeed_SourceKind
    │  ├─ CurrentSpeed_SourceTag
+   │  ├─ CurrentSpeed_SourceMode
    │  ├─ SetSpeed
+   │  ├─ SetSpeed_Role
    │  ├─ SetSpeed_SourceKind
    │  └─ SetSpeed_SourceTag
    └─ PumpB
       ├─ CurrentSpeed
+      ├─ CurrentSpeed_Role
       └─ CurrentSpeed_SourceKind
 ```
 
@@ -165,8 +198,8 @@ FT Optix preserved all browse paths, structure, data types, values, and descript
 
 Focus on small Model and binding patterns before full UI generation.
 
-- Probe 05A: JSON schema hardening for tag-backed variables. **Current priority.**
-- Probe 05B: Generate Model variables from hardened JSON and preserve source intent as metadata/helper variables.
+- Probe 05A: JSON schema hardening for tag-backed variables. **Schema and validator added; continue refining as needed.**
+- Probe 05B: Generate Model variables from hardened JSON and preserve source intent as metadata/helper variables. **Template added; manual FT Optix test pending.**
 - Probe 05C: DynamicLink pattern discovery using DesignTime NetLogic.
 - Probe 05D: FT Echo / dummy PLC live tag verification.
 - Probe 06: recipe target model pattern based on `Model/Recipes` plus later `Recipes/RecipeSchema`.
