@@ -2,7 +2,7 @@
 
 ## Status
 
-Result: **planned / ready for manual test**.
+Result: **manual validation and valid-generation test successful**.
 
 Probe 04D proved the repeatable loop:
 
@@ -53,6 +53,41 @@ The C# template reads this fixed path:
 ```text
 C:\Temp\ftoptix_model_spec.json
 ```
+
+## Manual verification observed
+
+Invalid JSON tests were rejected before generation with clear Studio Output messages:
+
+```text
+validation failed: Duplicate child name 'Pump1' under AI_InvalidProbe_DuplicateChild.
+validation failed: rootName is required.
+validation failed: Unknown dataType 'Real' at AI_InvalidProbe_UnknownDataType/Pump1/SetSpeed.
+```
+
+Valid JSON test generated the expected structure:
+
+```text
+Model
+└─ AI_ValidationProbe_01
+   ├─ PumpValid
+   └─ TankValid
+```
+
+Selecting `PumpValid` showed the expected child variables in the Properties panel:
+
+```text
+SetSpeed: Float = 80
+CurrentSpeed: Float = 78.400002
+Running: Boolean = True
+```
+
+This confirms the generator can do:
+
+```text
+JSON file -> validation -> native FT Optix generation
+```
+
+Note: old Studio Output errors and warnings may remain visible as log history. Judge the latest run by timestamp and Project View changes.
 
 ## Manual test - valid JSON
 
@@ -132,7 +167,7 @@ Without validation, a bad JSON spec could create partial project nodes and make 
 
 ## Expected outcome
 
-If this works, the generator foundation becomes:
+This works. The generator foundation now includes:
 
 ```text
 JSON file -> validation -> native FT Optix generation
