@@ -1,0 +1,26 @@
+{
+  "generationMode": "skip",
+  "rootName": "AI_InvalidProbe_DuplicateChild",
+  "objects": [
+    {
+      "name": "Pump1",
+      "variables": [
+        {
+          "name": "SetSpeed",
+          "dataType": "Float",
+          "value": 50.0
+        }
+      ]
+    },
+    {
+      "name": "Pump1",
+      "variables": [
+        {
+          "name": "CurrentSpeed",
+          "dataType": "Float",
+          "value": 47.5
+        }
+      ]
+    }
+  ]
+}
