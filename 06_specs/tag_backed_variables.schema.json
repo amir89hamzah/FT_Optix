@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/amir89hamzah/FT_Optix/06_specs/tag_backed_variables.schema.json",
+  "title": "FT Optix Probe 05A tag-backed variable spec",
+  "description": "Schema for hardening AI-generated FT Optix variable specs before live PLC/DynamicLink generation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "specVersion",
+    "probe",
+    "rootName",
+    "objects"
+  ],
+  "properties": {
+    "specVersion": {
+      "const": "0.5a"
+    },
+    "probe": {
+      "const": "Probe 05A - tag-backed variables"
+    },
+    "rootName": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "objects": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/modelObject"
+      }
+    }
+  },
+  "$defs": {
+    "modelObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "variables"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "description": {
+          "type": "string"
+        },
+        "variables": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/variable"
+          }
+        }
+      }
+    },
+    "variable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "dataType",
+        "role",
+        "source"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "description": {
+          "type": "string"
+        },
+        "dataType": {
+          "enum": [
+            "Boolean",
+            "Int32",
+            "UInt32",
+            "Float",
+            "Double",
+            "String",
+            "DateTime"
+          ]
+        },
+        "role": {
+          "enum": [
+            "measured",
+            "setpoint",
+            "command",
+            "status",
+            "config",
+            "diagnostic"
+          ]
+        },
+        "source": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/plcTagSource"
+            },
+            {
+              "$ref": "#/$defs/mockSource"
+            },
+            {
+              "$ref": "#/$defs/staticSource"
+            }
+          ]
+        },
+        "display": {
+          "$ref": "#/$defs/display"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "role": {
+                "const": "setpoint"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          },
+          "then": {
+            "required": [
+              "display"
+            ],
+            "properties": {
+              "display": {
+                "required": [
+                  "min",
+                  "max"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "plcTagSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "tag",
+        "mode"
+      ],
+      "properties": {
+        "kind": {
+          "const": "plcTag"
+        },
+        "tag": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mode": {
+          "enum": [
+            "read",
+            "write",
+            "readWrite"
+          ]
+        }
+      }
+    },
+    "mockSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "const": "mock"
+        },
+        "value": true
+      }
+    },
+    "staticSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "kind": {
+          "const": "static"
+        },
+        "value": true
+      }
+    },
+    "display": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "unit": {
+          "type": "string"
+        },
+        "decimals": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "format": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
