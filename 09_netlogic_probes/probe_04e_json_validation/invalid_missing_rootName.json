@@ -1,0 +1,11 @@
+{
+  "generationMode": "skip",
+  "variables": [
+    {
+      "name": "StatusText",
+      "dataType": "String",
+      "value": "This file is invalid because rootName is missing"
+    }
+  ],
+  "objects": []
+}
