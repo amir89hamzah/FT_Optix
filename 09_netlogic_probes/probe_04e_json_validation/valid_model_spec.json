@@ -1,0 +1,48 @@
+{
+  "generationMode": "skip",
+  "rootName": "AI_ValidationProbe_01",
+  "variables": [
+    {
+      "name": "StatusText",
+      "dataType": "String",
+      "value": "Created after JSON validation"
+    }
+  ],
+  "objects": [
+    {
+      "name": "PumpValid",
+      "variables": [
+        {
+          "name": "SetSpeed",
+          "dataType": "Float",
+          "value": 80.0
+        },
+        {
+          "name": "CurrentSpeed",
+          "dataType": "Float",
+          "value": 78.4
+        },
+        {
+          "name": "Running",
+          "dataType": "Boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "name": "TankValid",
+      "variables": [
+        {
+          "name": "Level",
+          "dataType": "Float",
+          "value": 55.5
+        },
+        {
+          "name": "Temperature",
+          "dataType": "Float",
+          "value": 29.2
+        }
+      ]
+    }
+  ]
+}
