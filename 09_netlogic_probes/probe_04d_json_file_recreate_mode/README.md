@@ -2,7 +2,7 @@
 
 ## Status
 
-Result: **planned / ready for manual test**.
+Result: **manual DesignTime NetLogic delete-and-recreate execution visually successful**.
 
 Probe 04C proved:
 
@@ -10,7 +10,7 @@ Probe 04C proved:
 external JSON file -> DesignTime NetLogic -> native FT Optix Model nodes
 ```
 
-Probe 04D adds controlled repeat-run behavior.
+Probe 04D added controlled repeat-run behavior.
 
 ## Goal
 
@@ -35,6 +35,8 @@ This probe checks whether a DesignTime NetLogic can:
 4. Recreate the root and children from JSON.
 ```
 
+Result: yes, the root was recreated from the changed JSON file.
+
 ## Files
 
 ```text
@@ -53,6 +55,36 @@ The C# template reads this fixed path:
 ```text
 C:\Temp\ftoptix_model_spec.json
 ```
+
+## Manual verification observed
+
+Before Probe 04D, `AI_JsonFileProbe_01` existed from Probe 04C with `PumpA` and `PumpB`.
+
+After changing the JSON file and rerunning the DesignTime NetLogic method, FT Optix Studio showed:
+
+```text
+Model
+└─ AI_JsonFileProbe_01
+   ├─ PumpA
+   ├─ PumpB
+   └─ PumpC
+```
+
+Selecting `PumpA` showed updated values:
+
+```text
+SetSpeed: Float = 75
+CurrentSpeed: Float = 73.199997
+Running: Boolean = True
+```
+
+This proves the generator read the file at:
+
+```text
+C:\Temp\ftoptix_model_spec.json
+```
+
+and recreated the generated root object from the updated JSON content.
 
 ## Expected generated structure
 
@@ -104,11 +136,7 @@ C:\Temp\ftoptix_model_spec.json
 
 2. In FT Optix, open the DesignTime NetLogic with VS Code.
 
-3. Replace the whole content of the generated `.cs` file with:
-
-```text
-09_netlogic_probes/probe_04d_json_file_recreate_mode/DesignTimeJsonFileRecreateGenerator.cs
-```
+3. Use the 04D C# template, or modify the 04C code to support `generationMode: deleteAndRecreate`.
 
 4. Make sure the C# class name exactly matches the FT Optix NetLogic object name.
 
@@ -144,7 +172,7 @@ Only delete the root object named by `rootName` in the JSON file. Do not delete 
 
 ## Expected outcome
 
-If this works, we have a repeatable generator loop:
+This works. We now have a repeatable generator loop:
 
 ```text
 edit JSON -> run DesignTime NetLogic -> generated nodes are recreated
