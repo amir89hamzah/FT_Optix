@@ -2,7 +2,7 @@
 
 ## Status
 
-Result: **ready for manual test**.
+Result: **manual DesignTime NetLogic JSON file execution visually successful**.
 
 Probe 04B proved this path:
 
@@ -10,11 +10,13 @@ Probe 04B proved this path:
 embedded JSON string -> DesignTime NetLogic -> native FT Optix Model nodes
 ```
 
-Probe 04C tests the more realistic workflow:
+Probe 04C tested the more realistic workflow:
 
 ```text
 JSON file on disk -> DesignTime NetLogic reads file -> native FT Optix Model nodes
 ```
+
+Result: yes. A JSON file at `C:\Temp\ftoptix_model_spec.json` was read by DesignTime NetLogic and generated the expected model object with two pump objects.
 
 ## Why this matters
 
@@ -45,6 +47,36 @@ If your NetLogic object has a different name, rename the C# class to match it ex
 3. NetLogic reads the JSON file.
 4. NetLogic creates Model nodes using FT Optix C# API.
 5. User exports NodeSet XML only for verification.
+```
+
+## Manual verification observed
+
+FT Optix Studio Project View showed:
+
+```text
+Model
+├─ AI_JsonProbe_01
+│  ├─ Pump1
+│  └─ Pump2
+└─ AI_JsonFileProbe_01
+   ├─ PumpA
+   └─ PumpB
+```
+
+Selecting `PumpA` showed the expected child variables in the Properties panel:
+
+```text
+SetSpeed: Float = 60
+CurrentSpeed: Float = 58.5
+Running: Boolean = True
+```
+
+This confirms:
+
+```text
+C:\Temp\ftoptix_model_spec.json
+    -> DesignTimeNetLogic1.cs
+    -> AI_JsonFileProbe_01 under Model
 ```
 
 ## First file-location idea
@@ -156,7 +188,7 @@ Do not delete or overwrite automatically until Probe 04D.
 
 ## Expected result
 
-If this works, the project has proven the core AI generator architecture:
+This proves the core AI generator architecture:
 
 ```text
 external generated JSON -> FT Optix DesignTime NetLogic -> native project nodes
