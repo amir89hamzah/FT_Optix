@@ -2,7 +2,7 @@
 
 ## Status
 
-Result: **planned / next test**.
+Result: **ready for manual test**.
 
 Probe 04B proved this path:
 
@@ -21,6 +21,21 @@ JSON file on disk -> DesignTime NetLogic reads file -> native FT Optix Model nod
 For an AI-assisted generator, the AI or an external script should be able to create a JSON spec file. FT Optix Studio should then load that spec through DesignTime NetLogic and create project nodes natively.
 
 This avoids direct YAML editing and keeps FT Optix Studio responsible for writing its own project structure.
+
+## Files
+
+```text
+DesignTimeJsonFileModelGenerator.cs
+ftoptix_model_spec.json
+```
+
+`DesignTimeJsonFileModelGenerator.cs` is intentionally copy-paste friendly for a default FT Optix DesignTime NetLogic named:
+
+```text
+DesignTimeNetLogic1
+```
+
+If your NetLogic object has a different name, rename the C# class to match it exactly.
 
 ## Proposed workflow
 
@@ -52,6 +67,62 @@ ProjectFiles\AI_Generator\model_spec.json
 
 or expose the path as a NetLogic variable/property.
 
+## Manual test steps
+
+1. Create this folder in Windows if it does not exist:
+
+```text
+C:\Temp
+```
+
+2. Copy the JSON content from:
+
+```text
+09_netlogic_probes/probe_04c_json_file_model_generator/ftoptix_model_spec.json
+```
+
+into:
+
+```text
+C:\Temp\ftoptix_model_spec.json
+```
+
+3. In FT Optix Studio, create or reuse a DesignTime NetLogic.
+
+4. Edit it with VS Code.
+
+5. Paste/adapt the code from:
+
+```text
+09_netlogic_probes/probe_04c_json_file_model_generator/DesignTimeJsonFileModelGenerator.cs
+```
+
+6. Make sure the class name matches the NetLogic object name. For a default object named `DesignTimeNetLogic1`, the class must be:
+
+```csharp
+public class DesignTimeNetLogic1 : BaseNetLogic
+```
+
+7. Save the `.cs` file.
+
+8. In FT Optix Studio, run:
+
+```text
+Method1
+```
+
+or:
+
+```text
+GenerateFromJsonFile
+```
+
+9. Check the Model folder for:
+
+```text
+AI_JsonFileProbe_01
+```
+
 ## Target generated structure
 
 Use a different root name from 04B to avoid collision:
@@ -71,9 +142,11 @@ Model
       └─ Running
 ```
 
+Note: FT Optix may show root variables such as `StatusText` and `GeneratedBy` in the Properties panel when the root object is selected.
+
 ## Safety behavior
 
-Initial behavior should be conservative:
+Initial behavior is conservative:
 
 ```text
 If AI_JsonFileProbe_01 already exists, log a warning and stop.
