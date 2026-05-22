@@ -11,8 +11,8 @@ Confirmed by manual test:
 - Probe 03: success, exported back and compared
 - Probe 04 XML: generated, but now secondary / hold while DesignTime NetLogic path is evaluated
 - Probe 04A-04E: DesignTime NetLogic JSON generation path was explored manually; it proved the engine direction but exposed the need to avoid ambiguous constant runtime values
-- Probe 05A: JSON schema hardening for tag-backed variables has started
-- Probe 05B: DesignTime NetLogic template added to generate Model nodes and preserve source intent metadata, but manual FT Optix test is still pending
+- Probe 05A: JSON schema hardening for tag-backed variables is **tested / pass**. Result recorded in `02_probes/probe_05a_json_schema_hardening/README.md`.
+- Probe 05B: DesignTime NetLogic template added to generate Model nodes and preserve source intent metadata, but manual FT Optix test is still pending. Do not proceed silently; prepare the step-by-step 05B manual test first.
 
 A BoilerDemo reference sample was reviewed from a `Nodes.zip` export plus runtime screenshots. The raw sample should not be committed until sanitized, but the observed patterns are useful as ground truth for future probes. See:
 
@@ -60,9 +60,21 @@ Reason:
 
 ## Immediate actions
 
-Prioritize a manual Probe 05B test in FT Optix before deeper Recipe/Datalogger/Alarm/UI probes.
+Prepare and run a manual Probe 05B test in FT Optix before deeper Recipe/Datalogger/Alarm/UI probes.
 
 ### Probe 05A - JSON schema hardening for tag-backed variables
+
+Status:
+
+```text
+TESTED / PASS
+```
+
+Result record:
+
+```text
+02_probes/probe_05a_json_schema_hardening/README.md
+```
 
 Goal:
 
@@ -105,6 +117,12 @@ source.kind = static
 ```
 
 ### Probe 05B - Preserve source intent in generated FT Optix Model nodes
+
+Status:
+
+```text
+TEMPLATE ADDED / MANUAL TEST PENDING
+```
 
 Current template:
 
@@ -198,7 +216,7 @@ FT Optix preserved all browse paths, structure, data types, values, and descript
 
 Focus on small Model and binding patterns before full UI generation.
 
-- Probe 05A: JSON schema hardening for tag-backed variables. **Schema and validator added; continue refining as needed.**
+- Probe 05A: JSON schema hardening for tag-backed variables. **Tested / pass.**
 - Probe 05B: Generate Model variables from hardened JSON and preserve source intent as metadata/helper variables. **Template added; manual FT Optix test pending.**
 - Probe 05C: DynamicLink pattern discovery using DesignTime NetLogic.
 - Probe 05D: FT Echo / dummy PLC live tag verification.
@@ -249,3 +267,5 @@ Delete AppData/Roaming/NuGet/NuGet.config
 ## Rule
 
 Do not rush into full dashboard XML. FT Optix generation should be built by small passing probes, with hardened JSON and DesignTime NetLogic treated as the likely primary automation route.
+
+Do not proceed silently between probes. Record status, explain the next objective, provide manual test steps, then continue only after the checkpoint is clear.
