@@ -14,6 +14,8 @@ Confirmed by manual test:
 - Probe 05A: JSON schema hardening for tag-backed variables is **tested / pass**. Result recorded in `02_probes/probe_05a_json_schema_hardening/README.md`.
 - Probe 05B: DesignTime NetLogic reads hardened JSON and creates Model nodes with source intent metadata. **Tested / pass**. Result recorded in `02_probes/probe_05b_tag_metadata_generator/README.md`.
 - Probe 05C-1: Local manual DynamicLink from `LinkedSpeed` to sibling `SourceSpeed` is **tested / pass**. Result recorded in `02_probes/probe_05c_dynamiclink_pattern_discovery/README.md`.
+- Probe 05C-2: Exported DynamicLink storage pattern is **tested / pass**. Export stored in `02_probes/probe_05c_dynamiclink_pattern_discovery/exported_AI_DynamicLinkProbe_01.xml`.
+- Probe 05C-3: DesignTime NetLogic DynamicLink generator template has been added. Manual FT Optix test is pending.
 
 A BoilerDemo reference sample was reviewed from a `Nodes.zip` export plus runtime screenshots. The raw sample should not be committed until sanitized, but the observed patterns are useful as ground truth for future probes. See:
 
@@ -45,6 +47,12 @@ Probe 05C DynamicLink discovery result is recorded here:
 02_probes/probe_05c_dynamiclink_pattern_discovery/README.md
 ```
 
+Probe 05C-3 DesignTime NetLogic template is recorded here:
+
+```text
+09_netlogic_probes/probe_05c_dynamiclink_netlogic_generator/
+```
+
 ## Strategy update
 
 The current best automation strategy is:
@@ -67,69 +75,72 @@ Reason:
 
 ## Immediate actions
 
-Prepare Probe 05C-2 before any further FT Optix changes.
+Run Probe 05C-3 manual FT Optix test.
 
-Probe 05C-2 should inspect or export the local DynamicLink representation before attempting to generate DynamicLinks from DesignTime NetLogic.
-
-### Probe 05A - JSON schema hardening for tag-backed variables
+### Probe 05C-3 - DesignTime NetLogic creates the same local DynamicLink automatically
 
 Status:
 
 ```text
-TESTED / PASS
-```
-
-Result record:
-
-```text
-02_probes/probe_05a_json_schema_hardening/README.md
-```
-
-Goal:
-
-```text
-Make AI-generated JSON explicit about variable role and source intent before any live PLC / FT Echo / DynamicLink test.
-```
-
-### Probe 05B - Preserve source intent in generated FT Optix Model nodes
-
-Status:
-
-```text
-TESTED / PASS
-```
-
-Result record:
-
-```text
-02_probes/probe_05b_tag_metadata_generator/README.md
+TEMPLATE ADDED / MANUAL TEST PENDING
 ```
 
 Template:
 
 ```text
-09_netlogic_probes/probe_05b_tag_metadata_generator/DesignTimeTagMetadataGenerator.cs
+09_netlogic_probes/probe_05c_dynamiclink_netlogic_generator/DesignTimeDynamicLinkGenerator.cs
 ```
 
 Goal:
 
 ```text
-Use DesignTime NetLogic to read the hardened JSON and create Model variables while preserving source intent as metadata/helper variables, without creating real DynamicLinks yet.
+Use DesignTime NetLogic to create:
+Model/AI_DynamicLinkNetLogicProbe_01/SourceSpeed
+Model/AI_DynamicLinkNetLogicProbe_01/LinkedSpeed
+and link LinkedSpeed to SourceSpeed.
 ```
 
-### Probe 05C - DynamicLink pattern discovery
+Important note:
+
+```text
+The first code attempt uses linkedSpeed.SetDynamicLink(sourceSpeed, DynamicLinkMode.ReadWrite).
+If this does not compile in the user's FT Optix version, capture the compiler error and update the probe based on the exact API available.
+```
+
+Expected generated structure:
+
+```text
+Model
+└─ AI_DynamicLinkNetLogicProbe_01
+   ├─ SourceSpeed
+   └─ LinkedSpeed
+```
+
+Expected runtime behavior:
+
+```text
+Changing SourceSpeed should update LinkedSpeed / linked UI display.
+```
+
+Scope limit:
+
+```text
+No FT Echo requirement yet.
+No full PLC tag browser requirement yet.
+No dashboard generation.
+No Recipe/Datalogger/Alarm generation yet.
+```
+
+FT Echo should be reserved for Probe 05D when the goal becomes live PLC tag verification.
+
+## Completed Probe 05C findings
+
+### 05C-1 local manual DynamicLink
 
 Status:
 
 ```text
-05C-1 LOCAL MANUAL DYNAMICLINK TESTED / PASS
-05C-2 EXPORT / INSPECT PATTERN PENDING
-```
-
-Result record:
-
-```text
-02_probes/probe_05c_dynamiclink_pattern_discovery/README.md
+TESTED / PASS
 ```
 
 Observed working local pattern:
@@ -148,55 +159,21 @@ SourceSpeed = 12.3  -> linked display 12.3
 SourceSpeed = 45.6  -> linked display 45.599998
 ```
 
-Mode note:
+### 05C-2 exported storage pattern
+
+Status:
 
 ```text
-The explicit Read mode selector was not found in the UI during the manual test.
-This is acceptable for 05C-1 because the link was functional.
-The mode/default mode should be inspected later through export or project-file review.
+TESTED / PASS
 ```
 
-Next 05C checkpoint:
+Export showed:
 
 ```text
-Export or inspect how FT Optix stores the local DynamicLink path, mode/default mode, and relative path.
+LinkedSpeed
+└─ DynamicLink = ../SourceSpeed
+   └─ Mode = 2
 ```
-
-Scope limit:
-
-```text
-No FT Echo requirement yet.
-No full PLC tag browser requirement yet.
-No dashboard generation.
-No Recipe/Datalogger/Alarm generation yet.
-```
-
-FT Echo should be reserved for Probe 05D when the goal becomes live PLC tag verification.
-
-## Optional XML action
-
-Probe 04 XML is still available:
-
-```text
-04_generated/AI_ModelProbe_04_PumpObjectType.xml
-```
-
-It can be tested later to check whether FT Optix accepts `UAObjectType` and object instances through NodeSet XML import. This is useful, but less important than proving the JSON -> DesignTime NetLogic generation path.
-
-## Last completed verification
-
-Probe 03 result:
-
-```text
-Expected nodes: 100
-Exported nodes: 100
-Missing paths: 0
-Extra paths: 0
-UAObjects: 21
-UAVariables: 79
-```
-
-FT Optix preserved all browse paths, structure, data types, values, and descriptions. FT Optix normalized namespace URI, model URI, node IDs, and access-level attributes on export.
 
 ## BoilerDemo-informed future probes
 
@@ -205,8 +182,8 @@ Focus on small Model and binding patterns before full UI generation.
 - Probe 05A: JSON schema hardening for tag-backed variables. **Tested / pass.**
 - Probe 05B: Generate Model variables from hardened JSON and preserve source intent as metadata/helper variables. **Tested / pass.**
 - Probe 05C-1: Local manual DynamicLink pattern. **Tested / pass.**
-- Probe 05C-2: Export / inspect DynamicLink storage pattern. **Next checkpoint.**
-- Probe 05C-3: DesignTime NetLogic creates the same local DynamicLink automatically.
+- Probe 05C-2: Export / inspect DynamicLink storage pattern. **Tested / pass.**
+- Probe 05C-3: DesignTime NetLogic creates the same local DynamicLink automatically. **Template added; manual FT Optix test pending.**
 - Probe 05D: FT Echo / dummy PLC live tag verification.
 - Probe 06: recipe target model pattern based on `Model/Recipes` plus later `Recipes/RecipeSchema`.
 - Probe 07: datalogger-ready model variables and `VariablesToLog` / datastore pattern.
@@ -240,17 +217,6 @@ Known cleanup actions:
 Clear VS Code cache folders under AppData/Roaming/Code
 Delete AppData/Roaming/NuGet/NuGet.config
 ```
-
-## Things to verify
-
-- Whether FT Optix has any official external SDK equivalent to Studio 5000 LDSDK. Current evidence still points to NetLogic rather than a full external SDK.
-- Whether DesignTime NetLogic can create all required objects: screens, panels, navigation, dataloggers, recipes, alarms, dynamic links, and aliases.
-- Whether a DesignTime NetLogic can import a JSON spec generated by AI and create a project structure safely.
-- Whether FT Optix accepts a minimal `UAObjectType` through NodeSet XML import.
-- Whether imported `UAObject` instances preserve a custom `HasTypeDefinition` after export.
-- Which FT Optix YAML fields are required vs generated automatically by Studio.
-- How FT Optix normalizes `DynamicLink` paths after save/export.
-- How to create DynamicLink nodes safely from DesignTime NetLogic.
 
 ## Rule
 
