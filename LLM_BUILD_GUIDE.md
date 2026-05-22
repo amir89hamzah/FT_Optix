@@ -21,6 +21,7 @@ Before making changes, read:
 
 ```text
 Milestone 06 = PASS
+Probe 05C-4 = PASS
 Current priority = Milestone 07 / Probe 05D
 ```
 
@@ -33,6 +34,12 @@ Hardened JSON
 → _LocalSources
 → local DynamicLinks
 → runtime value update
+```
+
+Probe 05C-4 proved the exact explicit DynamicLink mode syntax:
+
+```csharp
+generatedVariable.SetDynamicLink(sourceVariable, FTOptix.CoreBase.DynamicLinkMode.ReadWrite);
 ```
 
 Milestone 07 must prove:
@@ -81,16 +88,40 @@ static = configuration or non-runtime-changing value
 
 ## DynamicLink rule
 
-Known working API:
+Known working basic API:
 
 ```csharp
-linkedSpeed.SetDynamicLink(sourceSpeed);
+generatedVariable.SetDynamicLink(sourceVariable);
 ```
 
-Known not compiling in the tested context:
+Known working explicit mode API from Probe 05C-4:
 
 ```csharp
-linkedSpeed.SetDynamicLink(sourceSpeed, DynamicLinkMode.ReadWrite);
+generatedVariable.SetDynamicLink(sourceVariable, FTOptix.CoreBase.DynamicLinkMode.Read);
+generatedVariable.SetDynamicLink(sourceVariable, FTOptix.CoreBase.DynamicLinkMode.Write);
+generatedVariable.SetDynamicLink(sourceVariable, FTOptix.CoreBase.DynamicLinkMode.ReadWrite);
+```
+
+Use the fully qualified enum name unless the namespace import has been verified:
+
+```text
+FTOptix.CoreBase.DynamicLinkMode
+```
+
+Known earlier failing shorthand:
+
+```csharp
+generatedVariable.SetDynamicLink(sourceVariable, DynamicLinkMode.ReadWrite);
+```
+
+That failed because `DynamicLinkMode` was not available unqualified in the tested C# context.
+
+Suggested JSON `source.mode` mapping for future generator work:
+
+```text
+read      -> FTOptix.CoreBase.DynamicLinkMode.Read
+write     -> FTOptix.CoreBase.DynamicLinkMode.Write
+readWrite -> FTOptix.CoreBase.DynamicLinkMode.ReadWrite
 ```
 
 Do not invent alternate overloads unless a new probe is created and tested.
@@ -141,7 +172,7 @@ Do not generate these until their lower-level proofs pass:
 
 ## Current next action for an LLM
 
-The next correct action is not to edit the Milestone 06 generator.
+The next correct action is not to edit the Milestone 06 generator silently.
 
 The next correct action is to prepare and run:
 
