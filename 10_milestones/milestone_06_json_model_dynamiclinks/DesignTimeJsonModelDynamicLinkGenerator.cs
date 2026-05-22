@@ -82,7 +82,7 @@ public class DesignTimeJsonModelDynamicLinkGenerator : BaseNetLogic
                     localSourceObject.Add(sourceVariable);
 
                     var generatedVariable = MakeVariable(variableSpec.Name, variableSpec.DataType);
-                    generatedVariable.Value = GetNeutralValue(variableSpec.DataType);
+                    SetNeutralValue(generatedVariable, variableSpec.DataType);
                     generatedObject.Add(generatedVariable);
 
                     generatedVariable.SetDynamicLink(sourceVariable);
@@ -174,23 +174,22 @@ public class DesignTimeJsonModelDynamicLinkGenerator : BaseNetLogic
             variable.Value = "2026-05-22T00:00:00Z";
     }
 
-    private static object GetNeutralValue(string dataType)
+    private static void SetNeutralValue(IUAVariable variable, string dataType)
     {
         if (dataType == "Boolean")
-            return false;
-        if (dataType == "Int32")
-            return 0;
-        if (dataType == "UInt32")
-            return 0u;
-        if (dataType == "Float")
-            return 0.0f;
-        if (dataType == "Double")
-            return 0.0;
-        if (dataType == "String")
-            return string.Empty;
-        if (dataType == "DateTime")
-            return "";
-        return string.Empty;
+            variable.Value = false;
+        else if (dataType == "Int32")
+            variable.Value = 0;
+        else if (dataType == "UInt32")
+            variable.Value = 0u;
+        else if (dataType == "Float")
+            variable.Value = 0.0f;
+        else if (dataType == "Double")
+            variable.Value = 0.0;
+        else if (dataType == "String")
+            variable.Value = string.Empty;
+        else if (dataType == "DateTime")
+            variable.Value = string.Empty;
     }
 
     private static void SetVariableValue(IUAVariable variable, string dataType, object rawValue)
