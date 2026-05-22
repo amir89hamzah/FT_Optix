@@ -1,5 +1,23 @@
 # Milestone 06 - JSON to Model variables to DynamicLinks
 
+## Status
+
+```text
+TESTED / PASS
+```
+
+Status basis:
+
+```text
+User-confirmed FT Optix manual test in project chat with screenshots.
+```
+
+Date recorded:
+
+```text
+2026-05-23
+```
+
 ## Purpose
 
 Milestone 06 combines the proven pieces from Probe 05A, 05B, and 05C into one cleaner generator path.
@@ -12,7 +30,7 @@ Previous proof points:
 05C - DesignTime NetLogic can create a working local DynamicLink
 ```
 
-Milestone 06 now combines them:
+Milestone 06 combines them:
 
 ```text
 Hardened JSON
@@ -32,13 +50,13 @@ For `source.kind = plcTag`, the generator creates a local simulated source under
 
 ## Input JSON
 
-Use the existing Probe 05A valid example:
+The existing Probe 05A valid example was used:
 
 ```text
 06_specs/examples/valid_tag_backed_variables.json
 ```
 
-Copy it to:
+It was copied to:
 
 ```text
 C:\Temp\ftoptix_milestone06_tag_backed_variables.json
@@ -50,21 +68,25 @@ C:\Temp\ftoptix_milestone06_tag_backed_variables.json
 DesignTimeJsonModelDynamicLinkGenerator.cs
 ```
 
-Paste the contents into a FT Optix DesignTime NetLogic class.
-
-If FT Optix created the file/class as `DesignTimeNetLogic2.cs`, change the class declaration to:
-
-```csharp
-public class DesignTimeNetLogic2 : BaseNetLogic
-```
-
-## Method to run
+Working FT Optix method:
 
 ```text
 GenerateJsonModelWithLocalDynamicLinks()
 ```
 
-## Expected generated structure
+A compile issue was found and fixed during testing:
+
+```text
+Cannot implicitly convert type 'object' to 'UAManagedCore.UAValue'
+```
+
+Fix:
+
+```text
+Replace object-returning GetNeutralValue(...) assignment with SetNeutralValue(variable, dataType), which assigns typed values directly.
+```
+
+## Generated structure observed
 
 ```text
 Model
@@ -76,10 +98,10 @@ Model
    │     ├─ Running
    │     └─ OperatorCommand
    ├─ PumpA
-   │  ├─ CurrentSpeed          -> DynamicLink to _LocalSources/PumpA/CurrentSpeed
-   │  ├─ SetSpeed              -> DynamicLink to _LocalSources/PumpA/SetSpeed
-   │  ├─ Running               -> DynamicLink to _LocalSources/PumpA/Running
-   │  ├─ OperatorCommand       -> DynamicLink to _LocalSources/PumpA/OperatorCommand
+   │  ├─ CurrentSpeed          -> DynamicLink to ../_LocalSources/PumpA/CurrentSpeed
+   │  ├─ SetSpeed              -> DynamicLink to ../_LocalSources/PumpA/SetSpeed
+   │  ├─ Running               -> DynamicLink to ../_LocalSources/PumpA/Running
+   │  ├─ OperatorCommand       -> DynamicLink to ../_LocalSources/PumpA/OperatorCommand
    │  └─ DisplayName           -> static value
    └─ PumpB
       ├─ CurrentSpeed          -> mock value
@@ -87,55 +109,89 @@ Model
       └─ Running               -> mock value
 ```
 
-## Expected behavior
+## Observed PumpA behavior
 
-For `PumpA`, values are linked to local simulated source variables.
+PumpA variables were generated with DynamicLinks to local simulated sources.
 
-For example:
-
-```text
-_LocalSources/PumpA/CurrentSpeed = 12.3
-PumpA/CurrentSpeed follows that value through DynamicLink
-```
-
-If the source value is changed to:
+Observed examples:
 
 ```text
-_LocalSources/PumpA/CurrentSpeed = 45.6
+PumpA/CurrentSpeed -> ../_LocalSources/PumpA/CurrentSpeed
+PumpA/SetSpeed     -> ../_LocalSources/PumpA/SetSpeed
+PumpA/Running      -> ../_LocalSources/PumpA/Running
 ```
 
-then a UI label linked to:
+Metadata preserved the original PLC tag intent:
+
+```text
+CurrentSpeed_SourceKind          = plcTag
+CurrentSpeed_GenerationSourceKind = localDynamicLink
+CurrentSpeed_SourceTag           = PumpA.CurrentSpeed
+CurrentSpeed_SourceMode          = read
+```
+
+## Observed PumpB behavior
+
+PumpB variables were generated as mock values because the JSON declares `source.kind = mock`.
+
+Observed examples:
+
+```text
+PumpB/CurrentSpeed = 78.400002
+PumpB/SetSpeed     = 80
+PumpB/Running      = True
+```
+
+The value `78.400002` is acceptable Float display behavior and should be handled later by display precision / formatting.
+
+## Runtime confirmation
+
+A UI label was linked to:
 
 ```text
 Model/AI_JsonDynamicLinkProbe_01/PumpA/CurrentSpeed
 ```
 
-should update at runtime/emulator.
+Runtime/emulator showed the linked value following its local source.
 
-For `PumpB`, values are written directly because the JSON declares them as mock values.
-
-## Pass criteria
-
-Milestone 06 passes if:
+Observed values:
 
 ```text
-1. The method compiles.
-2. The method runs without error.
-3. AI_JsonDynamicLinkProbe_01 appears under Model.
-4. _LocalSources is created.
-5. PumpA variables are linked to _LocalSources variables.
-6. PumpB mock values are written directly.
-7. Runtime/emulator shows at least one PumpA linked value following its local source.
+Initial linked display: 12.3
+After local source change: 45.6
 ```
 
-## Why this milestone matters
+The label formatting was changed from JSON-compliant display to numeric formatting:
 
-This is the bridge between safe AI JSON generation and real PLC-backed FT Optix generation.
+```text
+0.0 (1,234.0)
+```
 
-Once this works, the next major step can be:
+This avoided overly long/raw float display and showed `45.6` cleanly.
+
+## Result
+
+Milestone 06 is accepted as passed.
+
+It proves:
+
+1. DesignTime NetLogic can read the hardened JSON.
+2. The generator can create a combined model root.
+3. The generator can create local source variables for future `plcTag` intent.
+4. The generator can create generated process variables.
+5. The generator can create functional DynamicLinks from generated variables to local source variables.
+6. Mock/static values remain direct values.
+7. Runtime/emulator confirms the DynamicLink behavior.
+8. FT Echo is not required for this local simulation milestone.
+
+## Next checkpoint
+
+The next major step is:
 
 ```text
 Milestone 07 / Probe 05D - FT Echo or dummy PLC live tag verification
 ```
 
-At that point, FT Echo becomes relevant because the source is no longer local `_LocalSources`, but a real communication/tag path.
+At that point, FT Echo becomes relevant because the source will no longer be local `_LocalSources`, but a real communication/tag path.
+
+Do not jump into full dashboard, Recipe, Datalogger, or Alarm generation yet.
