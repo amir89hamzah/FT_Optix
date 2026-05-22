@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UANodeSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <NamespaceUris>
+    <Uri>Test</Uri>
+    <Uri>urn:FTOptix:CoreBase</Uri>
+    <Uri>urn:FTOptix:Core</Uri>
+  </NamespaceUris>
+  <Models>
+    <Model ModelUri="Test">
+      <RequiredModel ModelUri="http://opcfoundation.org/UA/"/>
+      <RequiredModel ModelUri="urn:FTOptix:CoreBase" Version="6.1.0.74"/>
+      <RequiredModel ModelUri="urn:FTOptix:Core" Version="5.0.0.38"/>
+    </Model>
+  </Models>
+  <Aliases/>
+  <UAVariable NodeId="ns=1;g=081eff0b-ad07-b4b1-ff82-27556dbd421b" ParentNodeId="ns=1;g=582c3b76-0955-0ceb-bab7-4f8eb02ebfa1" BrowseName="1:DynamicLink" WriteMask="594038" DataType="ns=3;i=6" AccessLevel="0">
+    <References>
+      <Reference ReferenceType="i=40">ns=2;i=9</Reference>
+      <Reference ReferenceType="ns=2;i=19" IsForward="false">ns=1;g=582c3b76-0955-0ceb-bab7-4f8eb02ebfa1</Reference>
+    </References>
+    <Value>
+      <uax:String>../SourceSpeed</uax:String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=23244148-e7e2-f03d-3b74-c6a892891f97" ParentNodeId="ns=1;g=d3931cc8-be8b-5ee8-da41-31ace7978e95" BrowseName="1:SourceSpeed" WriteMask="594038" DataType="i=10" AccessLevel="0">
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=d3931cc8-be8b-5ee8-da41-31ace7978e95</Reference>
+    </References>
+    <Value>
+      <uax:Float>45.6</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=582c3b76-0955-0ceb-bab7-4f8eb02ebfa1" ParentNodeId="ns=1;g=d3931cc8-be8b-5ee8-da41-31ace7978e95" BrowseName="1:LinkedSpeed" WriteMask="594038" DataType="i=10" AccessLevel="0">
+    <References>
+      <Reference ReferenceType="i=40">i=63</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=d3931cc8-be8b-5ee8-da41-31ace7978e95</Reference>
+    </References>
+    <Value>
+      <uax:Float>0</uax:Float>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;g=dbd0c594-f529-7fb2-3340-c67348cb63ea" ParentNodeId="ns=1;g=081eff0b-ad07-b4b1-ff82-27556dbd421b" BrowseName="2:Mode" WriteMask="594038" DataType="ns=2;i=14" AccessLevel="0">
+    <References>
+      <Reference ReferenceType="i=40">i=62</Reference>
+      <Reference ReferenceType="i=47" IsForward="false">ns=1;g=081eff0b-ad07-b4b1-ff82-27556dbd421b</Reference>
+    </References>
+    <Value>
+      <uax:Int32>2</uax:Int32>
+    </Value>
+  </UAVariable>
+  <UAObject NodeId="ns=1;g=d3931cc8-be8b-5ee8-da41-31ace7978e95" BrowseName="1:AI_DynamicLinkProbe_01" WriteMask="69876">
+    <References>
+      <Reference ReferenceType="i=40">i=61</Reference>
+    </References>
+  </UAObject>
+</UANodeSet>
