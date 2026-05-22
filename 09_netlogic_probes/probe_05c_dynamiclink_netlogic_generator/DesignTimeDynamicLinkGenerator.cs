@@ -44,16 +44,11 @@ public class DesignTimeDynamicLinkGenerator : BaseNetLogic
         linkedSpeed.Value = 0.0f;
         root.Add(linkedSpeed);
 
-        // Primary API attempt.
-        // This should create the same logical pattern as the manual export:
-        // LinkedSpeed
-        // └─ DynamicLink = ../SourceSpeed
-        //    └─ Mode = 2
-        //
-        // If this line does not compile in a specific FT Optix version, capture
-        // the compiler error. The fallback will be to inspect the available API
-        // names in that version and update this probe.
-        linkedSpeed.SetDynamicLink(sourceSpeed, DynamicLinkMode.ReadWrite);
+        // Working API confirmed in FT Optix manual test:
+        // This creates a functional local DynamicLink from LinkedSpeed to SourceSpeed.
+        // The earlier attempt with DynamicLinkMode.ReadWrite did not compile because
+        // DynamicLinkMode was not available in the tested FT Optix C# context.
+        linkedSpeed.SetDynamicLink(sourceSpeed);
 
         AddStringVariable(root, "Probe", "Probe 05C-3 - DesignTime NetLogic DynamicLink generator");
         AddStringVariable(root, "ExpectedLinkPath", "../SourceSpeed");
