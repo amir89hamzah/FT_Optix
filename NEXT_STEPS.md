@@ -32,6 +32,7 @@ Confirmed by manual tests:
 - Probe 05C-1: local manual DynamicLink from `LinkedSpeed` to sibling `SourceSpeed`. **Tested / pass**.
 - Probe 05C-2: exported DynamicLink storage pattern. **Tested / pass**.
 - Probe 05C-3: DesignTime NetLogic creates local DynamicLink automatically with `linkedSpeed.SetDynamicLink(sourceSpeed)`. **Tested / pass**.
+- Probe 05C-4: DesignTime NetLogic explicit DynamicLink mode syntax using `FTOptix.CoreBase.DynamicLinkMode.ReadWrite`. **Tested / pass**.
 - Milestone 06: combined JSON -> Model variables -> `_LocalSources` -> local DynamicLinks -> runtime/emulator value update. **Tested / pass**.
 
 ## Main strategy
@@ -49,6 +50,28 @@ AI / natural-language intent
 ```
 
 FT Echo is not needed for Milestone 06. FT Echo becomes relevant only when the source is a real PLC/dummy controller tag instead of local simulated source variables.
+
+## DynamicLink mode finding
+
+Probe 05C-4 confirmed that explicit mode syntax compiles and works when the enum is fully qualified:
+
+```csharp
+generatedVariable.SetDynamicLink(sourceVariable, FTOptix.CoreBase.DynamicLinkMode.ReadWrite);
+```
+
+Use this mapping for future generator work:
+
+```text
+source.mode = read      -> FTOptix.CoreBase.DynamicLinkMode.Read
+source.mode = write     -> FTOptix.CoreBase.DynamicLinkMode.Write
+source.mode = readWrite -> FTOptix.CoreBase.DynamicLinkMode.ReadWrite
+```
+
+Exported ReadWrite DynamicLinks showed:
+
+```text
+Mode = 2
+```
 
 ## Current priority
 
@@ -185,6 +208,7 @@ source.kind = plcTag
 → create generated Model variable
 → attach DynamicLink to real communication/tag path
 → preserve SourceKind, SourceTag, SourceMode metadata
+→ apply SourceMode using FTOptix.CoreBase.DynamicLinkMode
 ```
 
 ## Completed records
@@ -194,6 +218,8 @@ source.kind = plcTag
 02_probes/probe_05b_tag_metadata_generator/README.md
 02_probes/probe_05c_dynamiclink_pattern_discovery/README.md
 02_probes/probe_05c_dynamiclink_pattern_discovery/exported_AI_DynamicLinkProbe_01.xml
+02_probes/probe_05c4_dynamiclink_mode_syntax/README.md
+02_probes/probe_05c4_dynamiclink_mode_syntax/exported_AI_JsonDynamicLinkProbe_01_readwrite.xml
 09_netlogic_probes/probe_05b_tag_metadata_generator/
 09_netlogic_probes/probe_05c_dynamiclink_netlogic_generator/
 10_milestones/milestone_06_json_model_dynamiclinks/

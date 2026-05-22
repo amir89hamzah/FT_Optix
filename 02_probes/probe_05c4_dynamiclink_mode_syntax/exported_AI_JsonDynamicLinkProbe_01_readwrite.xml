@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UANodeSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <NamespaceUris>
+    <Uri>Test</Uri>
+    <Uri>urn:FTOptix:CoreBase</Uri>
+    <Uri>urn:FTOptix:Core</Uri>
+  </NamespaceUris>
+  <Models>
+    <Model ModelUri="Test">
+      <RequiredModel ModelUri="http://opcfoundation.org/UA/"/>
+      <RequiredModel ModelUri="urn:FTOptix:CoreBase" Version="6.1.0.74"/>
+      <RequiredModel ModelUri="urn:FTOptix:Core" Version="5.0.0.38"/>
+    </Model>
+  </Models>
+  <Aliases/>
+  <!-- Full exported file is kept locally during manual test. This repo copy records the key verified export pattern from Probe 05C-4. -->
+  <UAVariable BrowseName="1:DynamicLink" DataType="ns=3;i=6">
+    <Value>
+      <uax:String>../../_LocalSources/PumpA/CurrentSpeed</uax:String>
+    </Value>
+    <References>
+      <Reference ReferenceType="ns=2;i=19" IsForward="false">PumpA/CurrentSpeed</Reference>
+    </References>
+    <UAVariable BrowseName="2:Mode" DataType="ns=2;i=14">
+      <Value>
+        <uax:Int32>2</uax:Int32>
+      </Value>
+    </UAVariable>
+  </UAVariable>
+  <UAVariable BrowseName="1:DynamicLink" DataType="ns=3;i=6">
+    <Value>
+      <uax:String>../../_LocalSources/PumpA/SetSpeed</uax:String>
+    </Value>
+    <References>
+      <Reference ReferenceType="ns=2;i=19" IsForward="false">PumpA/SetSpeed</Reference>
+    </References>
+    <UAVariable BrowseName="2:Mode" DataType="ns=2;i=14">
+      <Value>
+        <uax:Int32>2</uax:Int32>
+      </Value>
+    </UAVariable>
+  </UAVariable>
+  <UAVariable BrowseName="1:DynamicLink" DataType="ns=3;i=6">
+    <Value>
+      <uax:String>../../_LocalSources/PumpA/Running</uax:String>
+    </Value>
+    <References>
+      <Reference ReferenceType="ns=2;i=19" IsForward="false">PumpA/Running</Reference>
+    </References>
+    <UAVariable BrowseName="2:Mode" DataType="ns=2;i=14">
+      <Value>
+        <uax:Int32>2</uax:Int32>
+      </Value>
+    </UAVariable>
+  </UAVariable>
+  <UAVariable BrowseName="1:DynamicLink" DataType="ns=3;i=6">
+    <Value>
+      <uax:String>../../_LocalSources/PumpA/OperatorCommand</uax:String>
+    </Value>
+    <References>
+      <Reference ReferenceType="ns=2;i=19" IsForward="false">PumpA/OperatorCommand</Reference>
+    </References>
+    <UAVariable BrowseName="2:Mode" DataType="ns=2;i=14">
+      <Value>
+        <uax:Int32>2</uax:Int32>
+      </Value>
+    </UAVariable>
+  </UAVariable>
+</UANodeSet>
