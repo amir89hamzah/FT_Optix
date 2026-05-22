@@ -12,7 +12,7 @@ Confirmed by manual test:
 - Probe 04 XML: generated, but now secondary / hold while DesignTime NetLogic path is evaluated
 - Probe 04A-04E: DesignTime NetLogic JSON generation path was explored manually; it proved the engine direction but exposed the need to avoid ambiguous constant runtime values
 - Probe 05A: JSON schema hardening for tag-backed variables is **tested / pass**. Result recorded in `02_probes/probe_05a_json_schema_hardening/README.md`.
-- Probe 05B: DesignTime NetLogic template added to generate Model nodes and preserve source intent metadata, but manual FT Optix test is still pending. Do not proceed silently; prepare the step-by-step 05B manual test first.
+- Probe 05B: DesignTime NetLogic reads hardened JSON and creates Model nodes with source intent metadata. **Tested / pass**. Result recorded in `02_probes/probe_05b_tag_metadata_generator/README.md`.
 
 A BoilerDemo reference sample was reviewed from a `Nodes.zip` export plus runtime screenshots. The raw sample should not be committed until sanitized, but the observed patterns are useful as ground truth for future probes. See:
 
@@ -60,7 +60,9 @@ Reason:
 
 ## Immediate actions
 
-Prepare and run a manual Probe 05B test in FT Optix before deeper Recipe/Datalogger/Alarm/UI probes.
+Prepare Probe 05C before any further FT Optix changes.
+
+Probe 05C must not jump straight to FT Echo / full PLC integration. It should first discover the smallest reliable DesignTime NetLogic API pattern for creating FT Optix `DynamicLink` nodes.
 
 ### Probe 05A - JSON schema hardening for tag-backed variables
 
@@ -82,49 +84,21 @@ Goal:
 Make AI-generated JSON explicit about variable role and source intent before any live PLC / FT Echo / DynamicLink test.
 ```
 
-Current files:
-
-```text
-06_specs/tag_backed_variables.schema.json
-06_specs/examples/valid_tag_backed_variables.json
-06_specs/examples/invalid_ambiguous_value.json
-05_scripts/validate_json_specs.py
-```
-
-Expected validation commands:
-
-```bash
-python 05_scripts/validate_json_specs.py \
-  06_specs/examples/valid_tag_backed_variables.json
-
-python 05_scripts/validate_json_specs.py \
-  06_specs/examples/invalid_ambiguous_value.json
-```
-
-Expected result:
-
-```text
-valid_tag_backed_variables.json       -> OK
-invalid_ambiguous_value.json          -> FAIL
-```
-
-The invalid example must fail because it uses a raw `value` directly on a variable instead of declaring:
-
-```text
-source.kind = plcTag
-source.kind = mock
-source.kind = static
-```
-
 ### Probe 05B - Preserve source intent in generated FT Optix Model nodes
 
 Status:
 
 ```text
-TEMPLATE ADDED / MANUAL TEST PENDING
+TESTED / PASS
 ```
 
-Current template:
+Result record:
+
+```text
+02_probes/probe_05b_tag_metadata_generator/README.md
+```
+
+Template:
 
 ```text
 09_netlogic_probes/probe_05b_tag_metadata_generator/DesignTimeTagMetadataGenerator.cs
@@ -136,25 +110,7 @@ Goal:
 Use DesignTime NetLogic to read the hardened JSON and create Model variables while preserving source intent as metadata/helper variables, without creating real DynamicLinks yet.
 ```
 
-Manual test input path expected by the template:
-
-```text
-C:\Temp\ftoptix_probe05b_tag_backed_variables.json
-```
-
-Copy this repo file to that path before running the method:
-
-```text
-06_specs/examples/valid_tag_backed_variables.json
-```
-
-Method to run in FT Optix:
-
-```text
-GenerateTagMetadataModel()
-```
-
-Example generated structure:
+Observed generated structure:
 
 ```text
 Model
@@ -177,12 +133,31 @@ Model
 
 ### Probe 05C - DynamicLink pattern discovery
 
-Only after 05A/05B are stable.
+Status:
+
+```text
+NOT STARTED
+```
 
 Goal:
 
 ```text
 Learn the smallest reliable FT Optix DesignTime NetLogic API pattern to create DynamicLink nodes.
+```
+
+Scope limit:
+
+```text
+No FT Echo requirement yet.
+No full PLC tag browser requirement yet.
+No dashboard generation.
+No Recipe/Datalogger/Alarm generation yet.
+```
+
+Recommended first target:
+
+```text
+Create a tiny local DynamicLink-like probe or a DynamicLink node pattern that can be inspected/exported safely before connecting to a real PLC source.
 ```
 
 This can be explored without a real PLC first, but FT Echo / dummy PLC will eventually be needed to prove live values.
@@ -217,8 +192,8 @@ FT Optix preserved all browse paths, structure, data types, values, and descript
 Focus on small Model and binding patterns before full UI generation.
 
 - Probe 05A: JSON schema hardening for tag-backed variables. **Tested / pass.**
-- Probe 05B: Generate Model variables from hardened JSON and preserve source intent as metadata/helper variables. **Template added; manual FT Optix test pending.**
-- Probe 05C: DynamicLink pattern discovery using DesignTime NetLogic.
+- Probe 05B: Generate Model variables from hardened JSON and preserve source intent as metadata/helper variables. **Tested / pass.**
+- Probe 05C: DynamicLink pattern discovery using DesignTime NetLogic. **Next checkpoint.**
 - Probe 05D: FT Echo / dummy PLC live tag verification.
 - Probe 06: recipe target model pattern based on `Model/Recipes` plus later `Recipes/RecipeSchema`.
 - Probe 07: datalogger-ready model variables and `VariablesToLog` / datastore pattern.
