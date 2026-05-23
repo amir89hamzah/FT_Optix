@@ -4,7 +4,7 @@
 
 ```text
 05D-1 MANUAL LIVE READ TAG TESTED / PASS
-05D-2 MANUAL READWRITE TAG PLANNED
+05D-2 MANUAL READWRITE TAG TESTED / PASS
 05D-3 MANUAL BOOLEAN READ TAG PLANNED
 05D-4 MANUAL WRITE COMMAND TAG PLANNED
 05D-5 GENERATOR LIVE DYNAMICLINK PLANNED
@@ -65,13 +65,13 @@ PumpA.Running           Boolean / BOOL
 PumpA.OperatorCommand   String
 ```
 
-During 05D-1, the actual available Logix test tag was:
+During 05D-1 and 05D-2, the actual available Logix test tag was:
 
 ```text
 PumpA_Speed             REAL
 ```
 
-This is acceptable for 05D-1 because the purpose is to prove one live REAL tag read path before testing the final naming/schema path.
+This is acceptable because the purpose is to prove the live REAL read/write path before testing the final naming/schema path.
 
 ## Tested environment notes
 
@@ -95,6 +95,8 @@ FactoryTalk Optix:
 - Communication driver path used: CommDrivers / RAEtherNetIPDriver1 / RAEtherNetIPStation1
 - Tag importer route: 127.0.0.1
 - Imported controller tag: PumpA_Speed
+- Read display object: Label linked to PumpA_Speed
+- Write/readWrite object: EditableLabel linked to PumpA_Speed
 ```
 
 ## Test 05D-1 - Manual live read tag
@@ -175,34 +177,63 @@ Logix Echo / Studio 5000 controller tag
 
 Prove FT Optix can write a runtime value back to the controller tag.
 
-### Suggested next tag
-
-Use the same proven tag first:
+### Actual tested tag
 
 ```text
 PumpA_Speed
 ```
 
-Then add a final-schema tag later if needed:
+### Manual steps used
 
 ```text
-PumpA_SetSpeed
-```
-
-### Manual steps
-
-```text
-1. Bind FT Optix input/display to PumpA_Speed or PumpA_SetSpeed.
-2. Run runtime/emulator.
-3. Change the value from FT Optix runtime.
-4. Confirm the controller tag changes in Studio 5000 / Logix Designer.
+1. Use the same imported RA EtherNet/IP tag proven in 05D-1: PumpA_Speed.
+2. Add an FT Optix EditableLabel object.
+3. Bind EditableLabel.Text to PumpA_Speed.
+4. Run FT Optix emulator/runtime.
+5. Edit the black EditableLabel value in the FT Optix runtime.
+6. Confirm the Studio 5000 / Logix Designer monitor value for PumpA_Speed changes.
+7. Confirm the red read-only display linked to the same tag also follows the updated value.
 ```
 
 ### Expected result
 
 ```text
 Value written from FT Optix reaches controller tag.
+The read-only display linked to the same tag follows the new value.
 ```
+
+### Observed result
+
+Observed manual write/readWrite value:
+
+```text
+FT Optix runtime EditableLabel value = 888.5
+Studio 5000 / Logix Designer PumpA_Speed monitor value ≈ 888.5
+FT Optix runtime read display also shows 888.5
+```
+
+The screenshot shows the black FT Optix runtime editable value and red read display both at `888.5`, while Studio 5000 monitor shows the controller tag updated to the same value range.
+
+### Status
+
+```text
+PASS
+```
+
+### Finding
+
+Manual live read/write through FactoryTalk Logix Echo and RA EtherNet/IP tag import works for a REAL controller tag.
+
+The practical manual write path is:
+
+```text
+FT Optix runtime EditableLabel
+→ imported RA EtherNet/IP tag PumpA_Speed
+→ FactoryTalk Logix Echo / Studio 5000 controller tag
+→ red read-only FT Optix runtime display follows updated value
+```
+
+This proves the minimum manual live read/write path required before attempting generator-created live DynamicLinks.
 
 ## Test 05D-3 - Manual Boolean read tag
 
@@ -298,9 +329,9 @@ Actual: PumpA_Speed 123.4 displayed as 123.4; PumpA_Speed 567.77 displayed as 56
 Status: PASS
 
 05D-2 Manual readWrite tag:
-Expected: Value written from FT Optix reaches controller tag.
-Actual: Not run.
-Status: PLANNED
+Expected: Value written from FT Optix reaches controller tag and the read display follows.
+Actual: FT Optix runtime EditableLabel wrote 888.5 to PumpA_Speed; Studio 5000 monitor value updated; FT Optix read display also showed 888.5.
+Status: PASS
 
 05D-3 Boolean read tag:
 Expected: Boolean controller tag change is reflected in FT Optix runtime.
@@ -324,4 +355,11 @@ If manual live tag binding fails, do not edit the generator yet.
 
 If manual live tag binding passes, record the exact FT Optix path/API/pattern, then create a generator probe.
 
-05D-1 passed, so the next safe step is 05D-2 manual read/write using an imported RA EtherNet/IP tag.
+05D-1 and 05D-2 passed, so the next safe step is either:
+
+```text
+A. Probe 05D-3 manual BOOL read using PumpA_Running
+B. Probe 05D-4 manual command write using PumpA_Command
+```
+
+Do not move to 05D-5 generator-created live DynamicLinks until the remaining datatype/mode checks are clear or explicitly deferred.
