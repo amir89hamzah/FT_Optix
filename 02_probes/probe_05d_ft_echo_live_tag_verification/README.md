@@ -6,7 +6,7 @@
 05D-1 MANUAL LIVE READ TAG TESTED / PASS
 05D-2 MANUAL READWRITE TAG TESTED / PASS
 05D-3 MANUAL BOOLEAN READ + TEXT MAPPING TESTED / PASS
-05D-4 MANUAL WRITE COMMAND TAG PLANNED
+05D-4 MANUAL WRITE COMMAND TAG TESTED / PASS
 05D-5 GENERATOR LIVE DYNAMICLINK PLANNED
 ```
 
@@ -70,13 +70,14 @@ Actual tags used so far:
 ```text
 PumpA_Speed             REAL
 PumpA_Running           BOOL
+PumpA_Command           DINT
 ```
 
 This is acceptable because the purpose is to prove live datatype and read/write paths before testing the final naming/schema path.
 
 ## Tested environment notes
 
-Observed from manual screenshots:
+Observed from manual screenshots and exported XML:
 
 ```text
 FactoryTalk Logix Echo Dashboard:
@@ -92,16 +93,19 @@ Studio 5000 / Logix Designer:
 - Controller tags used:
   - PumpA_Speed   REAL
   - PumpA_Running BOOL
+  - PumpA_Command DINT
 
 FactoryTalk Optix:
-- Communication driver path used: CommDrivers / RAEtherNetIPDriver1 / RAEtherNetIPStation1
+- Communication driver path used: CommDrivers / RAEtherNet_IPDriver1 / RAEtherNet_IPStation1
 - Tag importer route: 127.0.0.1
 - Imported controller tags:
   - PumpA_Speed
   - PumpA_Running
+  - PumpA_Command
 - Read display object: Label linked to PumpA_Speed
 - Write/readWrite object: EditableLabel linked to PumpA_Speed
 - BOOL text display object: Label using Key-value converter linked to PumpA_Running
+- Command write object: EditableLabel linked to PumpA_Command
 ```
 
 ## Test 05D-1 - Manual live read tag
@@ -114,22 +118,6 @@ Prove FT Optix can manually read one live/dummy controller tag.
 
 ```text
 PumpA_Speed
-```
-
-### Manual steps used
-
-```text
-1. Start FactoryTalk Logix Echo.
-2. Confirm emulated controller Test is On and service is connected.
-3. In Studio 5000 / Logix Designer, confirm controller tag PumpA_Speed exists as REAL.
-4. In FactoryTalk Optix, add or use an RA EtherNet/IP driver and station.
-5. Use the RA EtherNet/IP tag importer in Online mode.
-6. Browse route 127.0.0.1.
-7. Import controller tag PumpA_Speed.
-8. Bind an FT Optix runtime label/display to PumpA_Speed.
-9. Run FT Optix emulator/runtime.
-10. Change PumpA_Speed in Logix Designer.
-11. Confirm FT Optix runtime display follows the controller tag value.
 ```
 
 ### Observed result
@@ -174,18 +162,6 @@ Prove FT Optix can write a runtime value back to the controller tag.
 PumpA_Speed
 ```
 
-### Manual steps used
-
-```text
-1. Use the same imported RA EtherNet/IP tag proven in 05D-1: PumpA_Speed.
-2. Add an FT Optix EditableLabel object.
-3. Bind EditableLabel.Text to PumpA_Speed.
-4. Run FT Optix emulator/runtime.
-5. Edit the black EditableLabel value in the FT Optix runtime.
-6. Confirm the Studio 5000 / Logix Designer monitor value for PumpA_Speed changes.
-7. Confirm the red read-only display linked to the same tag also follows the updated value.
-```
-
 ### Observed result
 
 ```text
@@ -212,8 +188,6 @@ FT Optix runtime EditableLabel
 → FactoryTalk Logix Echo / Studio 5000 controller tag
 → red read-only FT Optix runtime display follows updated value
 ```
-
-This proves the minimum manual live read/write path required before attempting generator-created live DynamicLinks.
 
 ## Test 05D-3 - Manual Boolean read tag with text mapping
 
@@ -248,32 +222,6 @@ Key/value mapping:
 - True  → Running
 ```
 
-### Manual steps used
-
-```text
-1. Create a Studio 5000 / Logix Designer controller tag named PumpA_Running with datatype BOOL.
-2. Import or expose PumpA_Running through the same RA EtherNet/IP driver/tag importer path used by 05D-1 and 05D-2.
-3. Add an FT Optix Label object.
-4. Open the Label.Text complex dynamic link editor.
-5. Add a Key-value converter.
-6. Set Source Dynamic Link to PumpA_Running.
-7. Configure values:
-   - False = Not run
-   - True  = Running
-8. Run FT Optix emulator/runtime.
-9. Set PumpA_Running = 1 / true in Studio 5000.
-10. Confirm FT Optix runtime label shows Running.
-11. Set PumpA_Running = 0 / false in Studio 5000.
-12. Confirm FT Optix runtime label shows Not run.
-```
-
-### Expected result
-
-```text
-PumpA_Running = 1 / true  → FT Optix runtime label shows Running
-PumpA_Running = 0 / false → FT Optix runtime label shows Not run
-```
-
 ### Observed result
 
 ```text
@@ -301,53 +249,73 @@ Studio 5000 BOOL tag PumpA_Running
 → Running / Not run runtime text
 ```
 
-This confirms that HMI status text can be generated later from JSON/UI intent without exposing raw `0/1` or `true/false` values to the operator.
-
 ## Test 05D-4 - Manual write command tag
 
 ### Objective
 
 Prove a command value can be written from FT Optix to the controller tag.
 
-### Suggested tag
+### Actual tested tag
 
 ```text
 PumpA_Command
 ```
 
-### Suggested datatype options
-
-Start with a simple command datatype before STRING if required:
+### Actual tested datatype
 
 ```text
-DINT command code:
-0 = None
-1 = Start
-2 = Stop
+DINT
 ```
 
-or, if STRING write works cleanly in the local project:
+### Manual object used
 
 ```text
-STRING command text:
-START
-STOP
+EditableLabel2
 ```
 
-### Manual steps
+### XML pattern observed
 
 ```text
-1. Create/import a command tag such as PumpA_Command.
-2. Bind an FT Optix input or command control to the command tag.
-3. Run runtime/emulator.
-4. Write START/STOP or numeric command values from FT Optix.
-5. Confirm controller tag receives the value.
+EditableLabel2
+└─ Text
+   └─ StringFormatter1
+      ├─ Format = {0:d}
+      ├─ Mode = 2
+      └─ Source0
+         └─ DynamicLink = /Objects/Test/CommDrivers/RAEtherNet_IPDriver1/RAEtherNet_IPStation1/Tags/Controller Tags/PumpA_Command
+            └─ Mode = 2
 ```
 
-### Expected result
+### Observed result
+
+Latest clean runtime screenshot showed:
 
 ```text
-Controller tag receives command value from FT Optix.
+FT Optix runtime command value = 7789
+Studio 5000 / Logix Designer PumpA_Command = 7789
+Studio Output = No Errors
+```
+
+Earlier StringFormatter inverse conversion messages were treated as stale/old after the latest clean runtime screenshot showed no active errors.
+
+### Status
+
+```text
+PASS
+```
+
+### Finding
+
+FT Optix can write a DINT command value to a live/dummy controller tag through an EditableLabel using a StringFormatter and ReadWrite DynamicLink mode.
+
+The practical command write path is:
+
+```text
+FT Optix runtime EditableLabel2
+→ StringFormatter {0:d}
+→ ReadWrite DynamicLink to PumpA_Command
+→ imported RA EtherNet/IP tag PumpA_Command
+→ FactoryTalk Logix Echo / Studio 5000 controller tag
 ```
 
 ## Test 05D-5 - Generator live DynamicLink
@@ -379,7 +347,7 @@ FT Optix version: not recorded in screenshot
 FT Echo / controller source: FactoryTalk Logix Echo
 Controller type: ControlLogix 5580 Emulator
 Controller/device name: Test
-Base tag source path: RAEtherNetIPDriver1 / RAEtherNetIPStation1 / Tags / Controller Tags
+Base tag source path: RAEtherNet_IPDriver1 / RAEtherNet_IPStation1 / Tags / Controller Tags
 
 05D-1 Manual read tag:
 Expected: FT Optix runtime display follows live controller REAL tag value.
@@ -398,8 +366,8 @@ Status: PASS
 
 05D-4 Write command tag:
 Expected: Command value written from FT Optix reaches controller tag.
-Actual: Not run.
-Status: PLANNED
+Actual: FT Optix runtime EditableLabel2 wrote 7789 to PumpA_Command; Studio 5000 monitor value updated; latest runtime screenshot showed no active Studio Output errors.
+Status: PASS
 
 05D-5 Generator live DynamicLink:
 Expected: Generator attaches generated variable to live communication/tag path.
@@ -413,10 +381,14 @@ If manual live tag binding fails, do not edit the generator yet.
 
 If manual live tag binding passes, record the exact FT Optix path/API/pattern, then create a generator probe.
 
-05D-1, 05D-2, and 05D-3 passed, so the next safe step is:
+05D-1, 05D-2, 05D-3, and 05D-4 passed.
+
+The next safe step is not another manual GUI test.
+
+The next safe step is generator-focused:
 
 ```text
-Probe 05D-4 manual command write using PumpA_Command
+Probe 05F XML pattern extraction → Probe 05G minimal generated UI/live-tag binding
 ```
 
-Do not move to 05D-5 generator-created live DynamicLinks until the remaining command write check is clear or explicitly deferred.
+Do not move to dashboards, alarms, recipes, trends, or dataloggers yet.
