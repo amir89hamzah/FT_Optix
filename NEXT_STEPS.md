@@ -35,6 +35,7 @@ Confirmed by manual tests:
 - Probe 05C-4: DesignTime NetLogic explicit DynamicLink mode syntax using `FTOptix.CoreBase.DynamicLinkMode.ReadWrite`. **Tested / pass**.
 - Probe 05D-1: manual FactoryTalk Logix Echo / RA EtherNet/IP live REAL tag read using `PumpA_Speed`. **Tested / pass**.
 - Probe 05D-2: manual FactoryTalk Logix Echo / RA EtherNet/IP live REAL tag read/write using `PumpA_Speed` and FT Optix `EditableLabel`. **Tested / pass**.
+- Probe 05D-3: manual FactoryTalk Logix Echo / RA EtherNet/IP live BOOL tag read using `PumpA_Running` and FT Optix Key-value converter text mapping. **Tested / pass**.
 - Milestone 06: combined JSON -> Model variables -> `_LocalSources` -> local DynamicLinks -> runtime/emulator value update. **Tested / pass**.
 
 ## Main strategy
@@ -77,7 +78,7 @@ Mode = 2
 
 ## Live tag finding
 
-Probe 05D-1 and 05D-2 confirmed manual live read and write through FactoryTalk Logix Echo and RA EtherNet/IP into FT Optix runtime.
+Probe 05D-1 through 05D-3 confirmed manual live read, write, and BOOL display mapping through FactoryTalk Logix Echo and RA EtherNet/IP into FT Optix runtime.
 
 Observed manual read path:
 
@@ -99,10 +100,21 @@ FT Optix runtime EditableLabel
 → read-only FT Optix display linked to same tag follows updated value
 ```
 
-Test tag:
+Observed BOOL text mapping path:
 
 ```text
-PumpA_Speed   REAL
+Studio 5000 BOOL tag PumpA_Running
+→ imported RA EtherNet/IP tag PumpA_Running
+→ Label.Text complex dynamic link
+→ Key-value converter
+→ Running / Not run runtime text
+```
+
+Test tags:
+
+```text
+PumpA_Speed     REAL
+PumpA_Running   BOOL
 ```
 
 Observed read result:
@@ -120,11 +132,18 @@ Studio 5000 / Logix Designer PumpA_Speed monitor value updated to the same value
 FT Optix runtime read display also showed 888.5
 ```
 
+Observed BOOL mapping result:
+
+```text
+PumpA_Running = 1 → FT Optix runtime label = Running
+PumpA_Running = 0 → FT Optix runtime label = Not run
+```
+
 Formatting/rounding differences are accepted when caused by display formatting.
 
 ## Current priority
 
-### Probe 05D-3 - Manual Boolean live read tag
+### Probe 05D-4 - Manual command write tag
 
 Status:
 
@@ -135,23 +154,31 @@ PLANNED / NEXT CHECKPOINT
 Purpose:
 
 ```text
-Prove FT Optix can read a BOOL tag from FactoryTalk Logix Echo / dummy PLC.
+Prove FT Optix can write a command value to a FactoryTalk Logix Echo / dummy PLC tag.
 ```
 
-Suggested test tag:
+Suggested first test tag:
 
 ```text
-PumpA_Running   BOOL
+PumpA_Command   DINT
+```
+
+Suggested mapping:
+
+```text
+0 = None
+1 = Start
+2 = Stop
 ```
 
 Expected result:
 
 ```text
-Studio 5000 PumpA_Running = false → FT Optix runtime shows false/off
-Studio 5000 PumpA_Running = true  → FT Optix runtime shows true/on
+FT Optix writes command value 1 or 2
+→ Studio 5000 / Logix Designer PumpA_Command changes accordingly
 ```
 
-Do not proceed to generator live DynamicLinks, dashboard generation, alarms, recipes, dataloggers, or trends until the remaining manual live datatype/mode checkpoints are clear or explicitly deferred.
+Do not proceed to generator live DynamicLinks, dashboard generation, alarms, recipes, dataloggers, or trends until the command write checkpoint is clear or explicitly deferred.
 
 ## Milestone 07 / Probe 05D test order
 
@@ -198,25 +225,25 @@ Studio 5000 / Logix Designer monitor value updated.
 FT Optix runtime read display also showed 888.5.
 ```
 
-### Probe 05D-3 - Manual Boolean read tag
+### Probe 05D-3 - Manual Boolean read tag with text mapping
 
-Objective:
+Status:
 
 ```text
-Prove Boolean datatype mapping works for live/dummy controller tags.
+TESTED / PASS
 ```
 
-Suggested tag:
+Actual tested tag:
 
 ```text
 PumpA_Running
 ```
 
-Expected result:
+Observed result:
 
 ```text
-false → FT Optix shows false/off
-true  → FT Optix shows true/on
+PumpA_Running = 1 → Running
+PumpA_Running = 0 → Not run
 ```
 
 ### Probe 05D-4 - Manual write command tag
@@ -275,7 +302,7 @@ source.kind = plcTag
 
 ## Later, not now
 
-After the remaining manual live datatype/mode checks are completed or explicitly deferred, the repo should move toward generated HMI screens in this order:
+After the remaining manual live command check is completed or explicitly deferred, the repo should move toward generated HMI screens in this order:
 
 ```text
 1. JSON to simple overview screen
