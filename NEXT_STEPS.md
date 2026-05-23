@@ -34,6 +34,7 @@ Confirmed by manual tests:
 - Probe 05C-3: DesignTime NetLogic creates local DynamicLink automatically with `linkedSpeed.SetDynamicLink(sourceSpeed)`. **Tested / pass**.
 - Probe 05C-4: DesignTime NetLogic explicit DynamicLink mode syntax using `FTOptix.CoreBase.DynamicLinkMode.ReadWrite`. **Tested / pass**.
 - Probe 05D-1: manual FactoryTalk Logix Echo / RA EtherNet/IP live REAL tag read using `PumpA_Speed`. **Tested / pass**.
+- Probe 05D-2: manual FactoryTalk Logix Echo / RA EtherNet/IP live REAL tag read/write using `PumpA_Speed` and FT Optix `EditableLabel`. **Tested / pass**.
 - Milestone 06: combined JSON -> Model variables -> `_LocalSources` -> local DynamicLinks -> runtime/emulator value update. **Tested / pass**.
 
 ## Main strategy
@@ -76,9 +77,9 @@ Mode = 2
 
 ## Live tag finding
 
-Probe 05D-1 confirmed manual live read from FactoryTalk Logix Echo through RA EtherNet/IP into FT Optix runtime.
+Probe 05D-1 and 05D-2 confirmed manual live read and write through FactoryTalk Logix Echo and RA EtherNet/IP into FT Optix runtime.
 
-Observed manual path:
+Observed manual read path:
 
 ```text
 FactoryTalk Logix Echo / Studio 5000 controller tag
@@ -89,24 +90,41 @@ FactoryTalk Logix Echo / Studio 5000 controller tag
 → runtime value update
 ```
 
+Observed manual write path:
+
+```text
+FT Optix runtime EditableLabel
+→ imported RA EtherNet/IP tag PumpA_Speed
+→ FactoryTalk Logix Echo / Studio 5000 controller tag
+→ read-only FT Optix display linked to same tag follows updated value
+```
+
 Test tag:
 
 ```text
 PumpA_Speed   REAL
 ```
 
-Observed result:
+Observed read result:
 
 ```text
 PumpA_Speed = 123.4  → FT Optix runtime display = 123.4
 PumpA_Speed = 567.77 → FT Optix runtime display = 567.8
 ```
 
-The `567.77 -> 567.8` display is accepted as formatting/rounding behavior.
+Observed write/readWrite result:
+
+```text
+FT Optix runtime EditableLabel value = 888.5
+Studio 5000 / Logix Designer PumpA_Speed monitor value updated to the same value range
+FT Optix runtime read display also showed 888.5
+```
+
+Formatting/rounding differences are accepted when caused by display formatting.
 
 ## Current priority
 
-### Probe 05D-2 - Manual readWrite live tag
+### Probe 05D-3 - Manual Boolean live read tag
 
 Status:
 
@@ -117,30 +135,23 @@ PLANNED / NEXT CHECKPOINT
 Purpose:
 
 ```text
-Prove FT Optix can write a runtime value back to a FactoryTalk Logix Echo / dummy PLC tag.
+Prove FT Optix can read a BOOL tag from FactoryTalk Logix Echo / dummy PLC.
 ```
 
-Recommended first test tag:
+Suggested test tag:
 
 ```text
-PumpA_Speed
-```
-
-Reason:
-
-```text
-PumpA_Speed is already imported and proven readable in 05D-1.
-Use the known-good path first before creating a separate SetSpeed tag.
+PumpA_Running   BOOL
 ```
 
 Expected result:
 
 ```text
-Change value from FT Optix runtime
-→ PumpA_Speed changes in Studio 5000 / Logix Designer monitor view
+Studio 5000 PumpA_Running = false → FT Optix runtime shows false/off
+Studio 5000 PumpA_Running = true  → FT Optix runtime shows true/on
 ```
 
-Do not proceed to generator live DynamicLinks, dashboard generation, alarms, recipes, dataloggers, or trends until the manual live write/readWrite checkpoint is clear.
+Do not proceed to generator live DynamicLinks, dashboard generation, alarms, recipes, dataloggers, or trends until the remaining manual live datatype/mode checkpoints are clear or explicitly deferred.
 
 ## Milestone 07 / Probe 05D test order
 
@@ -167,23 +178,24 @@ Observed result:
 
 ### Probe 05D-2 - Manual readWrite tag
 
-Objective:
+Status:
 
 ```text
-Prove FT Optix can write from runtime back to a live/dummy controller tag.
+TESTED / PASS
 ```
 
-Recommended tag:
+Actual tested tag:
 
 ```text
 PumpA_Speed
 ```
 
-Expected result:
+Observed result:
 
 ```text
-Change value in FT Optix runtime
-→ PumpA_Speed changes in Studio 5000 / Logix Designer
+FT Optix runtime EditableLabel wrote 888.5 to PumpA_Speed.
+Studio 5000 / Logix Designer monitor value updated.
+FT Optix runtime read display also showed 888.5.
 ```
 
 ### Probe 05D-3 - Manual Boolean read tag
@@ -203,8 +215,8 @@ PumpA_Running
 Expected result:
 
 ```text
-false → FT Optix shows false
-true  → FT Optix shows true
+false → FT Optix shows false/off
+true  → FT Optix shows true/on
 ```
 
 ### Probe 05D-4 - Manual write command tag
@@ -263,7 +275,7 @@ source.kind = plcTag
 
 ## Later, not now
 
-After live read/write passes, the repo should move toward generated HMI screens in this order:
+After the remaining manual live datatype/mode checks are completed or explicitly deferred, the repo should move toward generated HMI screens in this order:
 
 ```text
 1. JSON to simple overview screen
