@@ -21,7 +21,7 @@ User HMI intent
 
 ## Confirmed status
 
-Confirmed by manual tests:
+Confirmed by manual tests and XML pattern extraction:
 
 - Probe 01: Model-folder XML basic import success.
 - Probe 02: nested Model folder structure success.
@@ -36,6 +36,8 @@ Confirmed by manual tests:
 - Probe 05D-1: manual FactoryTalk Logix Echo / RA EtherNet/IP live REAL tag read using `PumpA_Speed`. **Tested / pass**.
 - Probe 05D-2: manual FactoryTalk Logix Echo / RA EtherNet/IP live REAL tag read/write using `PumpA_Speed` and FT Optix `EditableLabel`. **Tested / pass**.
 - Probe 05D-3: manual FactoryTalk Logix Echo / RA EtherNet/IP live BOOL tag read using `PumpA_Running` and FT Optix Key-value converter text mapping. **Tested / pass**.
+- Probe 05D-4: manual FactoryTalk Logix Echo / RA EtherNet/IP live DINT command write using `PumpA_Command` and FT Optix `EditableLabel`. **Tested / pass**.
+- Probe 05F: exported XML pattern extraction for live tag UI bindings. **Pattern extracted**.
 - Milestone 06: combined JSON -> Model variables -> `_LocalSources` -> local DynamicLinks -> runtime/emulator value update. **Tested / pass**.
 
 ## Main strategy
@@ -49,10 +51,8 @@ AI / natural-language intent
 → local DynamicLinks first
 → FT Echo / PLC-backed DynamicLinks
 → generated UI screens
-→ commands, alarms, trends, recipes, logging
+→ controls, alarms, trends, recipes, logging
 ```
-
-FT Echo is not needed for Milestone 06. FT Echo becomes relevant only when the source is a real PLC/dummy controller tag instead of local simulated source variables.
 
 ## DynamicLink mode finding
 
@@ -78,13 +78,27 @@ Mode = 2
 
 ## Live tag finding
 
-Probe 05D-1 through 05D-3 confirmed manual live read, write, and BOOL display mapping through FactoryTalk Logix Echo and RA EtherNet/IP into FT Optix runtime.
+Probe 05D-1 through 05D-4 confirmed manual live read, write, BOOL display mapping, and DINT command write through FactoryTalk Logix Echo and RA EtherNet/IP into FT Optix runtime.
+
+Test tags:
+
+```text
+PumpA_Speed     REAL
+PumpA_Running   BOOL
+PumpA_Command   DINT
+```
+
+Observed live tag path format from exported XML:
+
+```text
+/Objects/Test/CommDrivers/RAEtherNet_IPDriver1/RAEtherNet_IPStation1/Tags/Controller Tags/{TagName}
+```
 
 Observed manual read path:
 
 ```text
 FactoryTalk Logix Echo / Studio 5000 controller tag
-→ FT Optix RAEtherNetIPDriver station
+→ FT Optix RAEtherNet_IPDriver station
 → RA EtherNet/IP tag importer
 → imported controller tag under CommDrivers
 → UI label DynamicLink
@@ -110,40 +124,62 @@ Studio 5000 BOOL tag PumpA_Running
 → Running / Not run runtime text
 ```
 
-Test tags:
+Observed DINT command write path:
 
 ```text
-PumpA_Speed     REAL
-PumpA_Running   BOOL
+FT Optix runtime EditableLabel2
+→ StringFormatter {0:d}
+→ ReadWrite DynamicLink to PumpA_Command
+→ Studio 5000 / Logix Designer PumpA_Command monitor value updates
 ```
 
-Observed read result:
+## XML patterns now known
+
+### REAL read display
 
 ```text
-PumpA_Speed = 123.4  → FT Optix runtime display = 123.4
-PumpA_Speed = 567.77 → FT Optix runtime display = 567.8
+Label.Text
+└─ StringFormatter1
+   ├─ Format = {0:n1}
+   └─ Source0.DynamicLink = live PumpA_Speed path
 ```
 
-Observed write/readWrite result:
+### REAL editable read/write
 
 ```text
-FT Optix runtime EditableLabel value = 888.5
-Studio 5000 / Logix Designer PumpA_Speed monitor value updated to the same value range
-FT Optix runtime read display also showed 888.5
+EditableLabel.Text
+└─ StringFormatter1
+   ├─ Format = {0:n1}
+   ├─ Mode = 2
+   └─ Source0.DynamicLink = live PumpA_Speed path
+      └─ Mode = 2
 ```
 
-Observed BOOL mapping result:
+### BOOL status text
 
 ```text
-PumpA_Running = 1 → FT Optix runtime label = Running
-PumpA_Running = 0 → FT Optix runtime label = Not run
+Label.Text
+└─ KeyValueConverter1
+   ├─ Source.DynamicLink = live PumpA_Running path
+   └─ Pairs
+      ├─ false -> Not run
+      └─ true  -> Running
 ```
 
-Formatting/rounding differences are accepted when caused by display formatting.
+### DINT command input
+
+```text
+EditableLabel.Text
+└─ StringFormatter1
+   ├─ Format = {0:d}
+   ├─ Mode = 2
+   └─ Source0.DynamicLink = live PumpA_Command path
+      └─ Mode = 2
+```
 
 ## Current priority
 
-### Probe 05D-4 - Manual command write tag
+### Probe 05G - Minimal generator for live-tag UI bindings
 
 Status:
 
@@ -154,136 +190,26 @@ PLANNED / NEXT CHECKPOINT
 Purpose:
 
 ```text
-Prove FT Optix can write a command value to a FactoryTalk Logix Echo / dummy PLC tag.
+Create the smallest possible generator or NetLogic probe that recreates the proven XML patterns.
 ```
 
-Suggested first test tag:
+Do not generate a full HMI yet.
+
+Minimum generated screen should attempt only:
 
 ```text
-PumpA_Command   DINT
+1. Label for PumpA_Speed using StringFormatter {0:n1}
+2. EditableLabel for PumpA_Command using StringFormatter {0:d} and ReadWrite mode
+3. Label for PumpA_Running using KeyValueConverter false/true text mapping
 ```
 
-Suggested mapping:
+Key open technical question:
 
 ```text
-0 = None
-1 = Start
-2 = Stop
+Which exact FT Optix C# API calls create StringFormatter, KeyValueConverter, converter pairs, and dynamic link mode nodes under a UI object's Text property?
 ```
 
-Expected result:
-
-```text
-FT Optix writes command value 1 or 2
-→ Studio 5000 / Logix Designer PumpA_Command changes accordingly
-```
-
-Do not proceed to generator live DynamicLinks, dashboard generation, alarms, recipes, dataloggers, or trends until the command write checkpoint is clear or explicitly deferred.
-
-## Milestone 07 / Probe 05D test order
-
-### Probe 05D-1 - Manual read tag
-
-Status:
-
-```text
-TESTED / PASS
-```
-
-Actual tested tag:
-
-```text
-PumpA_Speed
-```
-
-Observed result:
-
-```text
-123.4 -> 123.4 displayed in FT Optix runtime
-567.77 -> 567.8 displayed in FT Optix runtime
-```
-
-### Probe 05D-2 - Manual readWrite tag
-
-Status:
-
-```text
-TESTED / PASS
-```
-
-Actual tested tag:
-
-```text
-PumpA_Speed
-```
-
-Observed result:
-
-```text
-FT Optix runtime EditableLabel wrote 888.5 to PumpA_Speed.
-Studio 5000 / Logix Designer monitor value updated.
-FT Optix runtime read display also showed 888.5.
-```
-
-### Probe 05D-3 - Manual Boolean read tag with text mapping
-
-Status:
-
-```text
-TESTED / PASS
-```
-
-Actual tested tag:
-
-```text
-PumpA_Running
-```
-
-Observed result:
-
-```text
-PumpA_Running = 1 → Running
-PumpA_Running = 0 → Not run
-```
-
-### Probe 05D-4 - Manual write command tag
-
-Objective:
-
-```text
-Prove a command string or command value can be written from FT Optix to the controller tag.
-```
-
-Suggested tag:
-
-```text
-PumpA_Command
-```
-
-Expected result:
-
-```text
-FT Optix writes a test command/value
-→ PumpA_Command changes in Studio 5000 / Logix Designer
-```
-
-### Probe 05D-5 - Generator live DynamicLink
-
-Objective:
-
-```text
-Update the generator only after manual live tag read/write binding passes.
-```
-
-Expected generator behavior:
-
-```text
-source.kind = plcTag
-→ create generated Model variable
-→ attach DynamicLink to real communication/tag path
-→ preserve SourceKind, SourceTag, SourceMode metadata
-→ apply SourceMode using FTOptix.CoreBase.DynamicLinkMode
-```
+If the API is unclear, create a tiny C# probe first and compare the exported XML with Probe 05F.
 
 ## Completed records
 
@@ -295,6 +221,7 @@ source.kind = plcTag
 02_probes/probe_05c4_dynamiclink_mode_syntax/README.md
 02_probes/probe_05c4_dynamiclink_mode_syntax/exported_AI_JsonDynamicLinkProbe_01_readwrite.xml
 02_probes/probe_05d_ft_echo_live_tag_verification/README.md
+02_probes/probe_05f_xml_pattern_extraction/README.md
 09_netlogic_probes/probe_05b_tag_metadata_generator/
 09_netlogic_probes/probe_05c_dynamiclink_netlogic_generator/
 10_milestones/milestone_06_json_model_dynamiclinks/
@@ -302,11 +229,11 @@ source.kind = plcTag
 
 ## Later, not now
 
-After the remaining manual live command check is completed or explicitly deferred, the repo should move toward generated HMI screens in this order:
+After minimal live-tag UI generation is proven, the repo should move toward generated HMI screens in this order:
 
 ```text
 1. JSON to simple overview screen
-2. UI labels and displays linked to Model variables
+2. UI labels and displays linked to live/model variables
 3. UI input controls for readWrite variables
 4. Command buttons for write variables
 5. Alarms
