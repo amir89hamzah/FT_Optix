@@ -3,7 +3,11 @@
 ## Status
 
 ```text
-PLANNED
+05D-1 MANUAL LIVE READ TAG TESTED / PASS
+05D-2 MANUAL READWRITE TAG PLANNED
+05D-3 MANUAL BOOLEAN READ TAG PLANNED
+05D-4 MANUAL WRITE COMMAND TAG PLANNED
+05D-5 GENERATOR LIVE DYNAMICLINK PLANNED
 ```
 
 ## Purpose
@@ -52,7 +56,7 @@ Only verify live tag connection behavior first.
 
 ## Minimum tag set
 
-Create or expose these dummy/live controller tags:
+Original planned tag set:
 
 ```text
 PumpA.CurrentSpeed      Float / REAL
@@ -61,13 +65,36 @@ PumpA.Running           Boolean / BOOL
 PumpA.OperatorCommand   String
 ```
 
-Suggested initial values:
+During 05D-1, the actual available Logix test tag was:
 
 ```text
-PumpA.CurrentSpeed = 12.3
-PumpA.SetSpeed = 50.0
-PumpA.Running = false
-PumpA.OperatorCommand = ""
+PumpA_Speed             REAL
+```
+
+This is acceptable for 05D-1 because the purpose is to prove one live REAL tag read path before testing the final naming/schema path.
+
+## Tested environment notes
+
+Observed from manual screenshots:
+
+```text
+FactoryTalk Logix Echo Dashboard:
+- Device name: Test
+- Type: ControlLogix 5580 Emulator
+- IP address: 127.0.0.1
+- Controller switch: On
+- Service connected
+
+Studio 5000 / Logix Designer:
+- Controller path used for browsing: Emulate Ethernet / 127.0.0.1
+- Test controller visible in FactoryTalk Linx Network Browser
+- Controller tag used: PumpA_Speed
+- Data type: REAL
+
+FactoryTalk Optix:
+- Communication driver path used: CommDrivers / RAEtherNetIPDriver1 / RAEtherNetIPStation1
+- Tag importer route: 127.0.0.1
+- Imported controller tag: PumpA_Speed
 ```
 
 ## Test 05D-1 - Manual live read tag
@@ -76,22 +103,32 @@ PumpA.OperatorCommand = ""
 
 Prove FT Optix can manually read one live/dummy controller tag.
 
-### Tag
+### Planned tag
 
 ```text
 PumpA.CurrentSpeed
 ```
 
-### Manual steps
+### Actual tested tag
 
 ```text
-1. Start FT Echo or dummy/live controller.
-2. Confirm PumpA.CurrentSpeed exists and has value 12.3.
-3. In FT Optix, manually create or bind a test variable/display to PumpA.CurrentSpeed.
-4. Run FT Optix runtime/emulator.
-5. Confirm display shows 12.3.
-6. Change controller tag value to 45.6.
-7. Confirm FT Optix runtime display updates to 45.6.
+PumpA_Speed
+```
+
+### Manual steps used
+
+```text
+1. Start FactoryTalk Logix Echo.
+2. Confirm emulated controller Test is On and service is connected.
+3. In Studio 5000 / Logix Designer, confirm controller tag PumpA_Speed exists as REAL.
+4. In FactoryTalk Optix, add or use an RA EtherNet/IP driver and station.
+5. Use the RA EtherNet/IP tag importer in Online mode.
+6. Browse route 127.0.0.1.
+7. Import controller tag PumpA_Speed.
+8. Bind an FT Optix runtime label/display to PumpA_Speed.
+9. Run FT Optix emulator/runtime.
+10. Change PumpA_Speed in Logix Designer.
+11. Confirm FT Optix runtime display follows the controller tag value.
 ```
 
 ### Expected result
@@ -100,12 +137,36 @@ PumpA.CurrentSpeed
 FT Optix runtime display follows the controller tag value.
 ```
 
-### Pass criteria
+### Observed result
+
+Observed live values:
 
 ```text
-12.3 displayed initially.
-45.6 displayed after controller tag change.
-No runtime link failure.
+PumpA_Speed = 123.4  → FT Optix runtime display = 123.4
+PumpA_Speed = 567.77 → FT Optix runtime display = 567.8
+```
+
+The `567.77 -> 567.8` display is acceptable because the FT Optix label formatting rounds to one decimal place.
+
+### Status
+
+```text
+PASS
+```
+
+### Finding
+
+Manual live read through FactoryTalk Logix Echo and RA EtherNet/IP tag import works.
+
+The practical manual binding path is:
+
+```text
+Logix Echo / Studio 5000 controller tag
+→ FT Optix RAEtherNetIPDriver station
+→ RA EtherNet/IP tag importer
+→ imported controller tag under CommDrivers
+→ UI label DynamicLink
+→ runtime value update
 ```
 
 ## Test 05D-2 - Manual readWrite tag
@@ -114,19 +175,27 @@ No runtime link failure.
 
 Prove FT Optix can write a runtime value back to the controller tag.
 
-### Tag
+### Suggested next tag
+
+Use the same proven tag first:
 
 ```text
-PumpA.SetSpeed
+PumpA_Speed
+```
+
+Then add a final-schema tag later if needed:
+
+```text
+PumpA_SetSpeed
 ```
 
 ### Manual steps
 
 ```text
-1. Bind FT Optix input/display to PumpA.SetSpeed.
+1. Bind FT Optix input/display to PumpA_Speed or PumpA_SetSpeed.
 2. Run runtime/emulator.
-3. Change SetSpeed from FT Optix runtime.
-4. Confirm PumpA.SetSpeed changes in FT Echo / dummy controller.
+3. Change the value from FT Optix runtime.
+4. Confirm the controller tag changes in Studio 5000 / Logix Designer.
 ```
 
 ### Expected result
@@ -141,20 +210,21 @@ Value written from FT Optix reaches controller tag.
 
 Prove Boolean datatype mapping works.
 
-### Tag
+### Suggested tag
 
 ```text
-PumpA.Running
+PumpA_Running
 ```
 
 ### Manual steps
 
 ```text
-1. Bind FT Optix indicator/display to PumpA.Running.
-2. Set controller tag false.
-3. Confirm FT Optix shows false.
-4. Set controller tag true.
-5. Confirm FT Optix shows true.
+1. Create/import a BOOL tag.
+2. Bind FT Optix indicator/display to the BOOL tag.
+3. Set controller tag false.
+4. Confirm FT Optix shows false.
+5. Set controller tag true.
+6. Confirm FT Optix shows true.
 ```
 
 ### Expected result
@@ -169,25 +239,26 @@ FT Optix runtime follows Boolean tag changes.
 
 Prove a command value can be written from FT Optix to the controller tag.
 
-### Tag
+### Suggested tag
 
 ```text
-PumpA.OperatorCommand
+PumpA_Command
 ```
 
 ### Manual steps
 
 ```text
-1. Bind an FT Optix text input or command control to PumpA.OperatorCommand.
-2. Run runtime/emulator.
-3. Write START from FT Optix.
-4. Confirm controller tag becomes START.
+1. Create/import a STRING or integer command tag.
+2. Bind an FT Optix text input or command control to the command tag.
+3. Run runtime/emulator.
+4. Write START or a test value from FT Optix.
+5. Confirm controller tag receives the value.
 ```
 
 ### Expected result
 
 ```text
-Controller tag receives command string from FT Optix.
+Controller tag receives command value from FT Optix.
 ```
 
 ## Test 05D-5 - Generator live DynamicLink
@@ -207,44 +278,44 @@ For source.kind = plcTag:
 - preserve SourceKind
 - preserve SourceTag
 - preserve SourceMode
+- apply SourceMode using FTOptix.CoreBase.DynamicLinkMode
 - record GenerationSourceKind = liveDynamicLink or equivalent
 ```
 
 ## Result log
 
-Fill this after testing:
-
 ```text
-Test date:
-FT Optix version:
-FT Echo / controller source:
-Controller type:
-Tag source path:
+Test date: 2026-05-23
+FT Optix version: not recorded in screenshot
+FT Echo / controller source: FactoryTalk Logix Echo
+Controller type: ControlLogix 5580 Emulator
+Controller/device name: Test
+Tag source path: RAEtherNetIPDriver1 / RAEtherNetIPStation1 / Tags / Controller Tags / PumpA_Speed
 
 05D-1 Manual read tag:
-Expected:
-Actual:
-Status: PASS / FAIL
+Expected: FT Optix runtime display follows live controller REAL tag value.
+Actual: PumpA_Speed 123.4 displayed as 123.4; PumpA_Speed 567.77 displayed as 567.8.
+Status: PASS
 
 05D-2 Manual readWrite tag:
-Expected:
-Actual:
-Status: PASS / FAIL
+Expected: Value written from FT Optix reaches controller tag.
+Actual: Not run.
+Status: PLANNED
 
 05D-3 Boolean read tag:
-Expected:
-Actual:
-Status: PASS / FAIL
+Expected: Boolean controller tag change is reflected in FT Optix runtime.
+Actual: Not run.
+Status: PLANNED
 
 05D-4 Write command tag:
-Expected:
-Actual:
-Status: PASS / FAIL
+Expected: Command value written from FT Optix reaches controller tag.
+Actual: Not run.
+Status: PLANNED
 
 05D-5 Generator live DynamicLink:
-Expected:
-Actual:
-Status: PASS / FAIL / NOT RUN
+Expected: Generator attaches generated variable to live communication/tag path.
+Actual: Not run.
+Status: PLANNED
 ```
 
 ## Decision rule
@@ -252,3 +323,5 @@ Status: PASS / FAIL / NOT RUN
 If manual live tag binding fails, do not edit the generator yet.
 
 If manual live tag binding passes, record the exact FT Optix path/API/pattern, then create a generator probe.
+
+05D-1 passed, so the next safe step is 05D-2 manual read/write using an imported RA EtherNet/IP tag.
