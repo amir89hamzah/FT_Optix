@@ -33,6 +33,7 @@ Confirmed by manual tests:
 - Probe 05C-2: exported DynamicLink storage pattern. **Tested / pass**.
 - Probe 05C-3: DesignTime NetLogic creates local DynamicLink automatically with `linkedSpeed.SetDynamicLink(sourceSpeed)`. **Tested / pass**.
 - Probe 05C-4: DesignTime NetLogic explicit DynamicLink mode syntax using `FTOptix.CoreBase.DynamicLinkMode.ReadWrite`. **Tested / pass**.
+- Probe 05D-1: manual FactoryTalk Logix Echo / RA EtherNet/IP live REAL tag read using `PumpA_Speed`. **Tested / pass**.
 - Milestone 06: combined JSON -> Model variables -> `_LocalSources` -> local DynamicLinks -> runtime/emulator value update. **Tested / pass**.
 
 ## Main strategy
@@ -73,9 +74,39 @@ Exported ReadWrite DynamicLinks showed:
 Mode = 2
 ```
 
+## Live tag finding
+
+Probe 05D-1 confirmed manual live read from FactoryTalk Logix Echo through RA EtherNet/IP into FT Optix runtime.
+
+Observed manual path:
+
+```text
+FactoryTalk Logix Echo / Studio 5000 controller tag
+→ FT Optix RAEtherNetIPDriver station
+→ RA EtherNet/IP tag importer
+→ imported controller tag under CommDrivers
+→ UI label DynamicLink
+→ runtime value update
+```
+
+Test tag:
+
+```text
+PumpA_Speed   REAL
+```
+
+Observed result:
+
+```text
+PumpA_Speed = 123.4  → FT Optix runtime display = 123.4
+PumpA_Speed = 567.77 → FT Optix runtime display = 567.8
+```
+
+The `567.77 -> 567.8` display is accepted as formatting/rounding behavior.
+
 ## Current priority
 
-### Milestone 07 / Probe 05D - FT Echo or dummy PLC live tag verification
+### Probe 05D-2 - Manual readWrite live tag
 
 Status:
 
@@ -86,48 +117,52 @@ PLANNED / NEXT CHECKPOINT
 Purpose:
 
 ```text
-Prove that source.kind = plcTag can bind to FT Echo or dummy PLC live tags, not only to local _LocalSources.
+Prove FT Optix can write a runtime value back to a FactoryTalk Logix Echo / dummy PLC tag.
 ```
 
-Target flow:
+Recommended first test tag:
 
 ```text
-Hardened JSON plcTag intent
-→ generated FT Optix variable
-→ DynamicLink / tag binding to communication path
-→ FT Echo or dummy PLC tag
-→ runtime value update
+PumpA_Speed
 ```
 
-Do not proceed to dashboard, full UI generation, alarms, recipes, dataloggers, or trends until the live tag checkpoint is clear.
-
-## Milestone 07 test order
-
-### Probe 05D-1 - Manual read tag
-
-Objective:
+Reason:
 
 ```text
-Prove FT Optix can manually read one FT Echo / dummy PLC tag.
-```
-
-Test tag:
-
-```text
-PumpA.CurrentSpeed
+PumpA_Speed is already imported and proven readable in 05D-1.
+Use the known-good path first before creating a separate SetSpeed tag.
 ```
 
 Expected result:
 
 ```text
-Controller tag value 12.3 → FT Optix runtime display 12.3
-Controller tag value 45.6 → FT Optix runtime display 45.6
+Change value from FT Optix runtime
+→ PumpA_Speed changes in Studio 5000 / Logix Designer monitor view
 ```
 
-Pass criteria:
+Do not proceed to generator live DynamicLinks, dashboard generation, alarms, recipes, dataloggers, or trends until the manual live write/readWrite checkpoint is clear.
+
+## Milestone 07 / Probe 05D test order
+
+### Probe 05D-1 - Manual read tag
+
+Status:
 
 ```text
-FT Optix runtime follows live/dummy controller tag changes.
+TESTED / PASS
+```
+
+Actual tested tag:
+
+```text
+PumpA_Speed
+```
+
+Observed result:
+
+```text
+123.4 -> 123.4 displayed in FT Optix runtime
+567.77 -> 567.8 displayed in FT Optix runtime
 ```
 
 ### Probe 05D-2 - Manual readWrite tag
@@ -138,17 +173,17 @@ Objective:
 Prove FT Optix can write from runtime back to a live/dummy controller tag.
 ```
 
-Test tag:
+Recommended tag:
 
 ```text
-PumpA.SetSpeed
+PumpA_Speed
 ```
 
 Expected result:
 
 ```text
 Change value in FT Optix runtime
-→ PumpA.SetSpeed changes in FT Echo / dummy controller
+→ PumpA_Speed changes in Studio 5000 / Logix Designer
 ```
 
 ### Probe 05D-3 - Manual Boolean read tag
@@ -159,10 +194,10 @@ Objective:
 Prove Boolean datatype mapping works for live/dummy controller tags.
 ```
 
-Test tag:
+Suggested tag:
 
 ```text
-PumpA.Running
+PumpA_Running
 ```
 
 Expected result:
@@ -177,20 +212,20 @@ true  → FT Optix shows true
 Objective:
 
 ```text
-Prove a command string can be written from FT Optix to the controller tag.
+Prove a command string or command value can be written from FT Optix to the controller tag.
 ```
 
-Test tag:
+Suggested tag:
 
 ```text
-PumpA.OperatorCommand
+PumpA_Command
 ```
 
 Expected result:
 
 ```text
-FT Optix writes START
-→ PumpA.OperatorCommand = START in FT Echo / dummy controller
+FT Optix writes a test command/value
+→ PumpA_Command changes in Studio 5000 / Logix Designer
 ```
 
 ### Probe 05D-5 - Generator live DynamicLink
@@ -198,7 +233,7 @@ FT Optix writes START
 Objective:
 
 ```text
-Update the generator only after manual live tag binding passes.
+Update the generator only after manual live tag read/write binding passes.
 ```
 
 Expected generator behavior:
@@ -220,6 +255,7 @@ source.kind = plcTag
 02_probes/probe_05c_dynamiclink_pattern_discovery/exported_AI_DynamicLinkProbe_01.xml
 02_probes/probe_05c4_dynamiclink_mode_syntax/README.md
 02_probes/probe_05c4_dynamiclink_mode_syntax/exported_AI_JsonDynamicLinkProbe_01_readwrite.xml
+02_probes/probe_05d_ft_echo_live_tag_verification/README.md
 09_netlogic_probes/probe_05b_tag_metadata_generator/
 09_netlogic_probes/probe_05c_dynamiclink_netlogic_generator/
 10_milestones/milestone_06_json_model_dynamiclinks/
@@ -227,7 +263,7 @@ source.kind = plcTag
 
 ## Later, not now
 
-After Milestone 07 passes, the repo should move toward generated HMI screens in this order:
+After live read/write passes, the repo should move toward generated HMI screens in this order:
 
 ```text
 1. JSON to simple overview screen
